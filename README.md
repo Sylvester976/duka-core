@@ -157,5 +157,3 @@ This project is being built in public as a learning exercise. See [BUILD_LOG.md]
 MIT — use it, fork it, build on it. Credit appreciated but not required.
 
 ---
-
-*Built in Nairobi. Inspired by the gap between what Kenyan developers learn in tutorials and what real production systems look like.*
