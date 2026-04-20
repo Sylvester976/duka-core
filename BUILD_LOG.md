@@ -32,7 +32,7 @@ This is intentionally written so that someone with no coding background can foll
 
 ---
 
-### Monday, April 21 — Project Setup
+### Tuesday, April 21 — Project Setup
 
 **Tasks**
 - [ ] Install Laravel 12: `composer create-project laravel/laravel duka-core`
