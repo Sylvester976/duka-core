@@ -32,16 +32,16 @@ This is intentionally written so that someone with no coding background can foll
 
 ---
 
-### Tuesday, April 21 — Project Setup
+### Monday, April 21 — Project Setup
 
 **Tasks**
-- [ ] Install Laravel 12: `composer create-project laravel/laravel duka-core`
-- [ ] Configure PostgreSQL database in `.env`
-- [ ] Install Redis and test connection
+- [x] Install Laravel 12: `composer create-project laravel/laravel duka-core`
+- [x] Configure PostgreSQL database in `.env`
+- [x] Install Redis and test connection
 - [ ] Install required packages:
-  - `composer require predis/predis` (Redis client)
-- [ ] Push initial project to GitHub
-- [ ] Create `BUILD_LOG.md` and `GUIDE.md` in repo
+    - [x] `composer require predis/predis` (Redis client)
+- [x] Push initial project to GitHub
+- [x] Create `BUILD_LOG.md` and `README.md` in repo
 
 **What it means**
 > Before any features exist, we set up the kitchen. This is like renting a workspace, buying the tools, and laying out the counter before you start cooking. Laravel is the framework (the recipe book), PostgreSQL is where all the data lives (the storage room), and Redis is a fast scratchpad used for things like shopping carts and background tasks. None of this is visible to anyone yet — it's purely preparation.
@@ -56,16 +56,16 @@ This is intentionally written so that someone with no coding background can foll
 
 **Tasks**
 - [ ] Write migrations for all core tables:
-  - `businesses` — stores each tenant (business on the platform)
-  - `platform_fee_configs` — how much the platform charges each business
-  - `products` — each business's products/services
-  - `orders` — customer purchases
-  - `order_items` — line items on each order
-  - `payments` — M-Pesa transaction records
-  - `remittances` — payouts to businesses
-  - `tax_invoices` — KRA eTIMS records
-  - `business_invoice_sequences` — sequential invoice numbering per business
-  - `subscription_payments` — monthly platform billing
+    - `businesses` — stores each tenant (business on the platform)
+    - `platform_fee_configs` — how much the platform charges each business
+    - `products` — each business's products/services
+    - `orders` — customer purchases
+    - `order_items` — line items on each order
+    - `payments` — M-Pesa transaction records
+    - `remittances` — payouts to businesses
+    - `tax_invoices` — KRA eTIMS records
+    - `business_invoice_sequences` — sequential invoice numbering per business
+    - `subscription_payments` — monthly platform billing
 - [ ] Run `php artisan migrate` — confirm all tables created
 - [ ] Commit: `"feat: initial database schema"`
 
@@ -81,10 +81,10 @@ This is intentionally written so that someone with no coding background can foll
 - [ ] Create `BelongsToTenant` trait
 - [ ] Apply trait to: `Product`, `Order`, `Payment`, `Remittance`, `TaxInvoice`
 - [ ] Write a test query to confirm scoping works:
-  - Create two test businesses manually in DB
-  - Add a product for each
-  - Confirm `Product::all()` without tenant context returns nothing (or all)
-  - Confirm `Product::all()` with tenant A in context returns only A's products
+    - Create two test businesses manually in DB
+    - Add a product for each
+    - Confirm `Product::all()` without tenant context returns nothing (or all)
+    - Confirm `Product::all()` with tenant A in context returns only A's products
 - [ ] Commit: `"feat: models and tenant global scope"`
 
 **What it means**
@@ -96,14 +96,14 @@ This is intentionally written so that someone with no coding background can foll
 
 **Tasks**
 - [ ] Create `ResolveTenant` middleware
-  - Reads `{slug}` from URL
-  - Looks up the business in DB (caches result in Redis for 5 minutes)
-  - Injects `tenant` into the application context
-  - Returns 404 if slug not found
+    - Reads `{slug}` from URL
+    - Looks up the business in DB (caches result in Redis for 5 minutes)
+    - Injects `tenant` into the application context
+    - Returns 404 if slug not found
 - [ ] Register middleware in `bootstrap/app.php`
 - [ ] Create `Platform\BusinessController`:
-  - `POST /admin/platform/businesses` — create a new business
-  - `GET /admin/platform/businesses` — list all businesses
+    - `POST /admin/platform/businesses` — create a new business
+    - `GET /admin/platform/businesses` — list all businesses
 - [ ] Create `Business` model with `api_key` auto-generation on creation
 - [ ] Test: create 2 businesses via Postman, verify slugs resolve correctly
 - [ ] Commit: `"feat: tenant middleware and business onboarding"`
@@ -118,10 +118,10 @@ This is intentionally written so that someone with no coding background can foll
 **Tasks**
 - [ ] Create `AuthenticateBusiness` middleware (validates `X-API-Key` header)
 - [ ] Create `Business\ProductController` with full CRUD:
-  - `GET /admin/biz/products` — list products
-  - `POST /admin/biz/products` — create product (with `tax_type`, `etims_item_code`)
-  - `PUT /admin/biz/products/{id}` — update
-  - `DELETE /admin/biz/products/{id}` — delete
+    - `GET /admin/biz/products` — list products
+    - `POST /admin/biz/products` — create product (with `tax_type`, `etims_item_code`)
+    - `PUT /admin/biz/products/{id}` — update
+    - `DELETE /admin/biz/products/{id}` — delete
 - [ ] Test all endpoints via Postman with two different business API keys
 - [ ] Confirm: Business A cannot see or edit Business B's products
 - [ ] Commit: `"feat: product CRUD with tenant auth"`
@@ -135,12 +135,12 @@ This is intentionally written so that someone with no coding background can foll
 
 **Tasks**
 - [ ] Create Blade layout `storefront/layout.blade.php`:
-  - Injects tenant `primary_color` as CSS variable
-  - Shows tenant logo and name in navbar
-  - Cart item count in header
+    - Injects tenant `primary_color` as CSS variable
+    - Shows tenant logo and name in navbar
+    - Cart item count in header
 - [ ] Create `Storefront\ProductController`:
-  - `GET /shop/{slug}` → product listing page
-  - `GET /shop/{slug}/products/{id}` → single product page
+    - `GET /shop/{slug}` → product listing page
+    - `GET /shop/{slug}/products/{id}` → single product page
 - [ ] Style with Bootstrap 5 — clean, functional, not fancy
 - [ ] Test: visit two different slugs, confirm different branding renders
 - [ ] Commit: `"feat: storefront product listing with tenant branding"`
@@ -158,13 +158,13 @@ This is intentionally written so that someone with no coding background can foll
 
 **Tasks**
 - [ ] Create `CartService`:
-  - Cart stored in Redis, key scoped to `tenant_id + session_id`
-  - Methods: `add()`, `remove()`, `get()`, `total()`, `clear()`
+    - Cart stored in Redis, key scoped to `tenant_id + session_id`
+    - Methods: `add()`, `remove()`, `get()`, `total()`, `clear()`
 - [ ] Create `Storefront\CartController`:
-  - `GET /shop/{slug}/cart`
-  - `POST /shop/{slug}/cart/add`
-  - `POST /shop/{slug}/cart/remove`
-  - `DELETE /shop/{slug}/cart`
+    - `GET /shop/{slug}/cart`
+    - `POST /shop/{slug}/cart/add`
+    - `POST /shop/{slug}/cart/remove`
+    - `DELETE /shop/{slug}/cart`
 - [ ] Create cart Blade view with item list and total
 - [ ] Test: add items from two different businesses, confirm carts don't mix
 - [ ] Commit: `"feat: Redis-backed tenant-scoped cart"`
@@ -178,15 +178,15 @@ This is intentionally written so that someone with no coding background can foll
 
 **Tasks**
 - [ ] Create `Storefront\CheckoutController`:
-  - `GET /shop/{slug}/checkout` → checkout form (phone number input)
-  - `POST /shop/{slug}/orders` → creates order from cart
+    - `GET /shop/{slug}/checkout` → checkout form (phone number input)
+    - `POST /shop/{slug}/orders` → creates order from cart
 - [ ] In order creation:
-  - Snapshot product prices into `order_items` (not a reference — a copy)
-  - Calculate and store fee split (`platform_fee` + `business_amount`) using `PaymentSplitService`
-  - Create `Payment` record with status `initiated`
-  - Clear cart after order created
+    - Snapshot product prices into `order_items` (not a reference — a copy)
+    - Calculate and store fee split (`platform_fee` + `business_amount`) using `PaymentSplitService`
+    - Create `Payment` record with status `initiated`
+    - Clear cart after order created
 - [ ] Create `Storefront\OrderController`:
-  - `GET /shop/{slug}/order/{id}` → order status page (pending/paid/failed)
+    - `GET /shop/{slug}/order/{id}` → order status page (pending/paid/failed)
 - [ ] Commit: `"feat: checkout flow and order creation with fee split"`
 
 **What it means**
@@ -198,10 +198,10 @@ This is intentionally written so that someone with no coding background can foll
 
 **Tasks**
 - [ ] Polish the order status page:
-  - Shows order items, total, and current status (pending / paid / failed)
-  - Auto-refreshes every 5 seconds while status is `pending` (simple meta refresh)
-  - Shows success message with order number when paid
-  - Shows failure message with retry option when failed
+    - Shows order items, total, and current status (pending / paid / failed)
+    - Auto-refreshes every 5 seconds while status is `pending` (simple meta refresh)
+    - Shows success message with order number when paid
+    - Shows failure message with retry option when failed
 - [ ] Add order history page for customers (by phone number lookup)
 - [ ] Commit: `"feat: order status page with auto-refresh"`
 
@@ -265,11 +265,11 @@ This is intentionally written so that someone with no coding background can foll
 **Tasks**
 - [ ] Register on [developer.safaricom.co.ke](https://developer.safaricom.co.ke) sandbox
 - [ ] Create `MpesaService`:
-  - `getAccessToken()` — OAuth token from Daraja
-  - `stkPush(phone, amount, orderId)` — send payment prompt to customer's phone
+    - `getAccessToken()` — OAuth token from Daraja
+    - `stkPush(phone, amount, orderId)` — send payment prompt to customer's phone
 - [ ] Wire STK Push into the checkout flow:
-  - After order is created → immediately call `stkPush()`
-  - Store `CheckoutRequestID` on the payment record
+    - After order is created → immediately call `stkPush()`
+    - Store `CheckoutRequestID` on the payment record
 - [ ] Set up ngrok: `ngrok http 8000` — update `MPESA_CALLBACK_URL` in `.env`
 - [ ] Test: trigger STK Push to sandbox test phone, confirm prompt appears (simulator)
 - [ ] Commit: `"feat: M-Pesa STK Push integration"`
@@ -283,11 +283,11 @@ This is intentionally written so that someone with no coding background can foll
 
 **Tasks**
 - [ ] Update `PaymentController::callback()` for production-level handling:
-  - Extract `MpesaReceiptNumber` (the transaction ID)
-  - Check UNIQUE constraint on `mpesa_txn_id` (idempotency)
-  - Wrap all DB updates in a transaction
-  - Dispatch `ProcessRemittance` job (don't await — just queue)
-  - Dispatch `SubmitEtimsInvoice` job (don't await — just queue)
+    - Extract `MpesaReceiptNumber` (the transaction ID)
+    - Check UNIQUE constraint on `mpesa_txn_id` (idempotency)
+    - Wrap all DB updates in a transaction
+    - Dispatch `ProcessRemittance` job (don't await — just queue)
+    - Dispatch `SubmitEtimsInvoice` job (don't await — just queue)
 - [ ] Add `POST /api/payments/callback` to `routes/api.php` (exempt from CSRF)
 - [ ] Test end-to-end with ngrok: place order → phone prompt → confirm → callback fires → order paid
 - [ ] Commit: `"feat: production-ready callback handler with job dispatch"`
@@ -301,11 +301,11 @@ This is intentionally written so that someone with no coding background can foll
 
 **Tasks**
 - [ ] Test full user journey end-to-end:
-  1. Visit storefront → add to cart → checkout → phone prompt → confirm → order paid
+    1. Visit storefront → add to cart → checkout → phone prompt → confirm → order paid
 - [ ] Test failure case: use sandbox number that simulates declined payment
 - [ ] Test duplicate callback: send same callback twice, confirm second is ignored
 - [ ] Test timeout: what happens if M-Pesa never sends the callback?
-  - Add a 30-minute auto-fail for stuck `pending` orders (scheduled command)
+    - Add a 30-minute auto-fail for stuck `pending` orders (scheduled command)
 - [ ] Commit: `"feat: edge case handling and timeout cleanup"`
 
 **What it means**
@@ -319,11 +319,11 @@ This is intentionally written so that someone with no coding background can foll
 - [ ] Add `b2c_initiator` and `b2c_credential` to `.env` + `config/services.php`
 - [ ] Add `b2cPayout(phone, amount, remittanceId)` to `MpesaService`
 - [ ] Create `ProcessRemittance` job:
-  - Fetch the remittance record
-  - Check it hasn't already been sent (idempotency)
-  - Call `b2cPayout()` with business's `payout_phone` and `business_amount`
-  - Update remittance status to `pending_callback`
-  - On failure (3 attempts): mark as `failed`, log error
+    - Fetch the remittance record
+    - Check it hasn't already been sent (idempotency)
+    - Call `b2cPayout()` with business's `payout_phone` and `business_amount`
+    - Update remittance status to `pending_callback`
+    - On failure (3 attempts): mark as `failed`, log error
 - [ ] Register queue worker configuration (Redis, `payments` queue)
 - [ ] Test: trigger a payment → confirm B2C call fires → check Daraja sandbox logs
 - [ ] Commit: `"feat: B2C auto-remittance job"`
@@ -337,13 +337,13 @@ This is intentionally written so that someone with no coding background can foll
 
 **Tasks**
 - [ ] Create B2C result and timeout callback endpoints:
-  - `POST /api/payments/b2c/result` — Safaricom sends payout confirmation here
-  - `POST /api/payments/b2c/timeout` — fires if B2C times out
+    - `POST /api/payments/b2c/result` — Safaricom sends payout confirmation here
+    - `POST /api/payments/b2c/timeout` — fires if B2C times out
 - [ ] Update remittance status to `sent` on success, `failed` on failure
 - [ ] Create `RetryFailedRemittances` scheduled job:
-  - Runs every 30 minutes
-  - Finds remittances with `status = failed` and `attempts < 3`
-  - Re-dispatches `ProcessRemittance` for each
+    - Runs every 30 minutes
+    - Finds remittances with `status = failed` and `attempts < 3`
+    - Re-dispatches `ProcessRemittance` for each
 - [ ] Register schedule in `routes/console.php`
 - [ ] Commit: `"feat: B2C callbacks and retry scheduler"`
 
@@ -356,14 +356,14 @@ This is intentionally written so that someone with no coding background can foll
 
 **Tasks**
 - [ ] End-to-end test of the complete money flow:
-  1. Place order
-  2. STK Push fires
-  3. Customer confirms
-  4. Order marked paid
-  5. `ProcessRemittance` job runs
-  6. B2C fires to business phone
-  7. B2C callback confirms
-  8. Remittance marked `sent`
+    1. Place order
+    2. STK Push fires
+    3. Customer confirms
+    4. Order marked paid
+    5. `ProcessRemittance` job runs
+    6. B2C fires to business phone
+    7. B2C callback confirms
+    8. Remittance marked `sent`
 - [ ] Verify all records in DB are correct (amounts, statuses, timestamps)
 - [ ] Document the flow with actual numbers (e.g. KES 1,000 in → KES 20 platform fee → KES 980 to business)
 - [ ] Commit: `"test: full payment to remittance end-to-end verified"`
@@ -384,10 +384,10 @@ This is intentionally written so that someone with no coding background can foll
 - [ ] Submit OSCU service request, email `timsupport@kra.go.ke`
 - [ ] Once credentials received: store `etims_device_serial` on test business
 - [ ] Create `EtimsService`:
-  - `initialize(business)` — OSCU initialization, stores returned `cmc_key` (encrypted)
-  - `submitSalesInvoice(order)` — builds payload, posts to `/trnsSales`
-  - `calculateVat(totalInclusive)` — extract VAT from inclusive price
-  - `getNextInvoiceNumber(businessId)` — locked DB increment
+    - `initialize(business)` — OSCU initialization, stores returned `cmc_key` (encrypted)
+    - `submitSalesInvoice(order)` — builds payload, posts to `/trnsSales`
+    - `calculateVat(totalInclusive)` — extract VAT from inclusive price
+    - `getNextInvoiceNumber(businessId)` — locked DB increment
 - [ ] Test initialization against sandbox
 - [ ] Commit: `"feat: eTIMS service and OSCU initialization"`
 
@@ -400,12 +400,12 @@ This is intentionally written so that someone with no coding background can foll
 
 **Tasks**
 - [ ] Create `SubmitEtimsInvoice` job:
-  - Checks `etims_enabled` on business before submitting
-  - Calls `EtimsService::submitSalesInvoice()`
-  - Creates `TaxInvoice` record with KRA response
-  - Updates `order.etims_submitted = true` and `order.tax_invoice_no`
-  - On failure: logs error, marks invoice as `rejected` — does NOT reverse the payment
-  - Handles `cmc_key` rotation (check for new key in response headers)
+    - Checks `etims_enabled` on business before submitting
+    - Calls `EtimsService::submitSalesInvoice()`
+    - Creates `TaxInvoice` record with KRA response
+    - Updates `order.etims_submitted = true` and `order.tax_invoice_no`
+    - On failure: logs error, marks invoice as `rejected` — does NOT reverse the payment
+    - Handles `cmc_key` rotation (check for new key in response headers)
 - [ ] Test: trigger a payment → confirm eTIMS job fires → check `tax_invoices` table
 - [ ] Commit: `"feat: async eTIMS invoice submission job"`
 
@@ -418,14 +418,14 @@ This is intentionally written so that someone with no coding background can foll
 
 **Tasks**
 - [ ] Update order status page to show:
-  - KRA invoice number
-  - KRA QR code image (from `qr_code_url`)
-  - "Verified by KRA" badge when eTIMS submitted
+    - KRA invoice number
+    - KRA QR code image (from `qr_code_url`)
+    - "Verified by KRA" badge when eTIMS submitted
 - [ ] Create Business Admin dashboard (`/admin/biz`):
-  - Orders list with status filters
-  - Payout history (remittances)
-  - eTIMS invoice log
-  - Branding settings form (upload logo, change color)
+    - Orders list with status filters
+    - Payout history (remittances)
+    - eTIMS invoice log
+    - Branding settings form (upload logo, change color)
 - [ ] Protect with `AuthenticateBusiness` middleware
 - [ ] Commit: `"feat: KRA receipt on order page and business admin dashboard"`
 
@@ -438,14 +438,14 @@ This is intentionally written so that someone with no coding background can foll
 
 **Tasks**
 - [ ] Create Platform Admin dashboard (`/admin/platform`):
-  - List all businesses with status and subscription info
-  - Total platform earnings (sum of all `platform_fee` on paid orders)
-  - Remittance overview (sent vs failed)
-  - Ability to suspend a business
+    - List all businesses with status and subscription info
+    - Total platform earnings (sum of all `platform_fee` on paid orders)
+    - Remittance overview (sent vs failed)
+    - Ability to suspend a business
 - [ ] Create basic subscription billing flow:
-  - `GET /admin/platform/businesses/{id}/bill` → trigger monthly fee STK Push
-  - On payment: create `subscription_payments` record, update `subscription_status = active`
-  - On non-payment after 7-day grace: `subscription_status = suspended`
+    - `GET /admin/platform/businesses/{id}/bill` → trigger monthly fee STK Push
+    - On payment: create `subscription_payments` record, update `subscription_status = active`
+    - On non-payment after 7-day grace: `subscription_status = suspended`
 - [ ] Commit: `"feat: platform admin dashboard and subscription billing"`
 
 **What it means**
@@ -457,17 +457,17 @@ This is intentionally written so that someone with no coding background can foll
 
 **Tasks**
 - [ ] Error handling audit:
-  - What happens if Redis is down? (graceful fallback)
-  - What happens if PostgreSQL is slow? (queue timeout handling)
-  - What happens if a business's payout phone is invalid? (alert + log)
+    - What happens if Redis is down? (graceful fallback)
+    - What happens if PostgreSQL is slow? (queue timeout handling)
+    - What happens if a business's payout phone is invalid? (alert + log)
 - [ ] Add rate limiting per tenant (Redis-backed, via middleware)
 - [ ] Update `.env.example` with all required variables and comments
 - [ ] Final README review — make sure it's clear enough for someone discovering this on GitHub
 - [ ] Update BUILD_LOG with final entry
 - [ ] Deploy to Render:
-  - Web service: `php artisan serve`
-  - Worker service: `php artisan queue:work`
-  - Run `php artisan migrate --force` on deploy
+    - Web service: `php artisan serve`
+    - Worker service: `php artisan queue:work`
+    - Run `php artisan migrate --force` on deploy
 - [ ] Tag release: `git tag v1.0.0`
 - [ ] Commit: `"chore: v1.0.0 — production deploy"`
 
