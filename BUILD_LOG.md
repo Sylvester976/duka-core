@@ -38,7 +38,7 @@ This is intentionally written so that someone with no coding background can foll
 - [x] Install Laravel 12: `composer create-project laravel/laravel duka-core`
 - [x] Configure PostgreSQL database in `.env`
 - [x] Install Redis and test connection
-- [ ] Install required packages:
+- [x] Install required packages:
     - [x] `composer require predis/predis` (Redis client)
 - [x] Push initial project to GitHub
 - [x] Create `BUILD_LOG.md` and `README.md` in repo
