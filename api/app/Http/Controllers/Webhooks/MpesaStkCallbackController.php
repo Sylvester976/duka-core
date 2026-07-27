@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Webhooks;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\ProcessRemittance;
 use App\Models\Order;
 use App\Models\WebhookEvent;
 use Illuminate\Http\Request;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Log;
 
 class MpesaStkCallbackController extends Controller
 {
+    use AcknowledgesMpesaCallback;
+
     public function __invoke(Request $request)
     {
         $callback = $request->input('Body.stkCallback');
@@ -51,6 +54,8 @@ class MpesaStkCallbackController extends Controller
                     'mpesa_txn_id' => $metadata->get('MpesaReceiptNumber'),
                     'paid_at' => now(),
                 ]);
+
+                ProcessRemittance::dispatch($order);
             } else {
                 $order->update(['status' => 'failed']);
             }
@@ -59,10 +64,5 @@ class MpesaStkCallbackController extends Controller
         $event->update(['processed_at' => now()]);
 
         return $this->accepted();
-    }
-
-    private function accepted()
-    {
-        return response()->json(['ResultCode' => 0, 'ResultDesc' => 'Accepted']);
     }
 }

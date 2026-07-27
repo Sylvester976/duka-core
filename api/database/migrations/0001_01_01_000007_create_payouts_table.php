@@ -16,6 +16,7 @@ return new class extends Migration
             $table->decimal('platform_fee', 10, 2);
             $table->decimal('net_amount', 10, 2);
             $table->enum('status', ['pending', 'processing', 'paid', 'failed'])->default('pending');
+            $table->string('mpesa_b2c_conversation_id')->nullable()->unique();
             $table->string('mpesa_b2c_txn_id')->nullable()->unique();
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();

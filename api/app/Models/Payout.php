@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'platform_fee',
     'net_amount',
     'status',
+    'mpesa_b2c_conversation_id',
     'mpesa_b2c_txn_id',
     'paid_at',
 ])]

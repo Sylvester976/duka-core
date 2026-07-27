@@ -6,6 +6,8 @@ use App\Http\Controllers\Dashboard\ProductController;
 use App\Http\Controllers\Storefront\CheckoutController;
 use App\Http\Controllers\Storefront\OrderStatusController;
 use App\Http\Controllers\Storefront\StorefrontController;
+use App\Http\Controllers\Webhooks\MpesaB2cResultController;
+use App\Http\Controllers\Webhooks\MpesaB2cTimeoutController;
 use App\Http\Controllers\Webhooks\MpesaStkCallbackController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,3 +32,5 @@ Route::prefix('shop/{slug}')->middleware('tenant.slug')->name('storefront.')->gr
 });
 
 Route::post('/webhooks/mpesa/stk', MpesaStkCallbackController::class);
+Route::post('/webhooks/mpesa/b2c/result', MpesaB2cResultController::class);
+Route::post('/webhooks/mpesa/b2c/timeout', MpesaB2cTimeoutController::class);
