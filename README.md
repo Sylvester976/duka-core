@@ -1,319 +1,208 @@
 # duka-core 🛒
 
-> A multi-tenant SaaS commerce platform built for the Kenyan market.
-> Businesses get their own branded online store, M-Pesa payments, and KRA eTIMS-compliant receipts — all from one platform.
+A multi-tenant SaaS commerce platform built for the Kenyan market. Businesses get their own branded online store, M-Pesa payments (money in via STK Push, money out via B2C), and automatic revenue splitting — all from one platform.
+
+Built in public as a learning project about **how real money actually moves through software**. Not fake Stripe test cards. Real M-Pesa. Real async payment flows where a customer taps confirm on their phone and the system has to wait, verify, split, and remit — without losing a single shilling.
 
 ---
 
-## Why This Exists
+## What it does
 
-I built duka-core to deeply understand how **real money moves through software**.
+Each business (tenant) on the platform gets:
 
-Not fake Stripe test cards. Not tutorial demos. Real M-Pesa. Real KRA tax invoices. Real async payment flows where a customer taps confirm on their phone and your system has to wait, verify, split, and remit — all without losing a single shilling.
+- **A branded storefront** — logo, brand color, custom URL slug
+- **Product management** — add, edit, remove products/services
+- **M-Pesa STK Push checkout** — customer pays, system waits for confirmation
+- **Automatic payouts** — platform takes its cut, business receives the rest via M-Pesa B2C
+- **A business dashboard** — orders, payout ledger, revenue at a glance
 
-This project is intentionally about learning. Every part of it — the multi-tenancy, the payment splits, the webhook security, the eTIMS integration — was chosen because it represents a real-world engineering problem worth solving properly.
-
-If you're a Kenyan developer who wants to understand how commerce platforms actually work under the hood, this is for you.
-
----
-
-## What It Does
-
-duka-core is a platform where you can add multiple businesses (tenants), each getting:
-
-- 🏪 **Their own branded storefront** — logo, colors, custom URL slug
-- 🛍️ **Product management** — add, edit, remove products/services
-- 💳 **M-Pesa STK Push payments** — customer pays, system waits for confirmation
-- 💸 **Automatic payouts** — platform takes its cut, business gets the rest via M-Pesa B2C
-- 🧾 **KRA eTIMS receipts** — every sale generates a KRA-compliant tax invoice with QR code
-- 📊 **Business dashboard** — orders, payout history, tax invoice log
-
-The platform owner earns a monthly fee per business and a percentage of every transaction — collected and remitted automatically.
+The platform owner earns a monthly fee per business plus a percentage of every transaction — split and remitted automatically.
 
 ---
 
-## What You'll Learn From This Codebase
-
-| Concept | Where It Lives |
-|---|---|
-| Multi-tenancy (shared DB, isolated data) | `BelongsToTenant` trait + Global Scopes |
-| Async payment flow (STK Push → callback) | `PaymentController` + `ProcessRemittance` job |
-| Money splitting and auto-remittance | `PaymentSplitService` + M-Pesa B2C |
-| Idempotency (preventing double charges) | `mpesa_txn_id` UNIQUE constraint + status checks |
-| Webhook security | Callback validation logic |
-| KRA eTIMS tax invoice generation | `EtimsService` + `SubmitEtimsInvoice` job |
-| Background job queues and retry logic | Laravel Queues + Redis |
-| Per-tenant branding via CSS variables | `storefront/layout.blade.php` |
-
----
-
-## Tech Stack
+## Tech stack
 
 | Layer | Technology |
 |---|---|
-| Backend | Laravel 12 (PHP 8.3) |
+| Frontend | React 18 + Vite + TypeScript + Tailwind CSS |
+| Data fetching | TanStack Query + Axios |
+| Backend | Laravel 12 (PHP 8.3), API-only |
+| Auth | Laravel Sanctum |
 | Database | PostgreSQL |
 | Cache + Queues | Redis |
-| Frontend | Blade templates + Bootstrap 5 |
 | Payments | M-Pesa Daraja API (STK Push + B2C) |
-| Tax Compliance | KRA eTIMS OSCU API |
 | Deployment | Render |
 
----
-
-## Architecture
-
-```
-[ Customer Browser ]
-        |
-  /shop/{business-slug}
-        |
-[ Laravel App ]
-   |        |        |
-[PostgreSQL] [Redis] [M-Pesa Daraja]
-                          |
-                   [KRA eTIMS OSCU]
-```
-
-Every payment goes through two async flows:
-1. **STK Push → Callback** — customer confirms, your server is notified
-2. **B2C Payout → Callback** — business receives their share automatically
+> **Note:** This is a rewritten stack. The frontend is now a decoupled React SPA (previously Blade). KRA eTIMS tax invoicing has been removed and is out of scope. See `ARCHITECTURE.md` and `DESIGN.md` for the full spec.
 
 ---
 
-## Running It Yourself
+## Architecture at a glance
+
+```
+[ React SPA ]  ──JSON──▶  [ Laravel API ]  ──▶  [ PostgreSQL ]
+  storefront                   │                 [ Redis (queues) ]
+  dashboard                    │                 [ M-Pesa Daraja ]
+```
+
+Two async round trips define the system:
+
+1. **Collect:** STK Push → customer confirms on phone → Daraja callback → order marked paid.
+2. **Payout:** split computed → B2C request → Daraja result callback → payout marked complete.
+
+Full detail in **[`ARCHITECTURE.md`](./ARCHITECTURE.md)**. Visual system in **[`DESIGN.md`](./DESIGN.md)**.
+
+---
+
+## Running it yourself
 
 ### Requirements
-- PHP 8.3+
+- PHP 8.3+, Composer
+- Node.js 20+
 - PostgreSQL
 - Redis
-- Composer
 - ngrok (for local M-Pesa callback testing)
 
-### Setup
+### Backend
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/duka-core.git
-cd duka-core
+cd duka-core/api
 
-composer install        # installs all dependencies from composer.json
-cp .env.example .env    # copy the environment template
+composer install
+cp .env.example .env
 php artisan key:generate
 
-# Fill in your .env — see the credentials sections below
+# Fill in your .env — DB, Redis, M-Pesa (see below)
 
 php artisan migrate
-php artisan db:seed     # creates a test business
+php artisan db:seed          # creates a platform admin + a test business
 
-php artisan serve
-php artisan queue:work  # run in a separate terminal — processes background jobs
+php artisan serve            # API on http://localhost:8000
+php artisan queue:work       # separate terminal — processes payout jobs
 ```
 
-Visit `http://localhost:8000/shop/test-business` to see the first storefront.
-
----
-
-## Getting Your Credentials
-
-### M-Pesa Daraja API (Sandbox)
-
-You need four values for your `.env`:
-`MPESA_CONSUMER_KEY`, `MPESA_CONSUMER_SECRET`, `MPESA_SHORTCODE`, `MPESA_PASSKEY`
-
-**Step 1 — Create a developer account**
-1. Go to [developer.safaricom.co.ke](https://developer.safaricom.co.ke)
-2. Click **Sign Up** — register as an individual or company
-3. Verify your email address and log in
-
-**Step 2 — Create a sandbox app**
-1. Click **My Apps** in the top navigation
-2. Click **Add a New App**
-3. Give it a name (e.g. `duka-core-dev`)
-4. Check both APIs:
-   - ✅ **Lipa Na M-Pesa Sandbox**
-   - ✅ **M-Pesa Sandbox**
-5. Click **Create App**
-
-**Step 3 — Copy your Consumer Key and Secret**
-1. Click on your newly created app
-2. You will see **Consumer Key** and **Consumer Secret** displayed
-3. Copy both into your `.env`:
-   ```env
-   MPESA_CONSUMER_KEY=xxxxxxxxxxxxxxxx
-   MPESA_CONSUMER_SECRET=xxxxxxxxxxxxxxxx
-   ```
-
-**Step 4 — Get your Shortcode and Passkey**
-1. Go to [developer.safaricom.co.ke/test_credentials](https://developer.safaricom.co.ke/test_credentials) while logged in
-2. You will see a full list of sandbox test values. Find:
-   - **Business Short Code** → use as `MPESA_SHORTCODE` (typically `174379`)
-   - **Lipa Na Mpesa Online Passkey** → use as `MPESA_PASSKEY`
-   - **Initiator Name (Shortcode 1)** → use as `MPESA_B2C_INITIATOR`
-   - **Security Credential (Shortcode 1)** → use as `MPESA_B2C_SECURITY_CREDENTIAL`
-
-> All sandbox credentials are pre-set by Safaricom. You do not create them yourself — you just copy them from this page.
-
-**Step 5 — Set up ngrok**
-
-M-Pesa sends payment results to a public URL. ngrok gives your local machine one temporarily:
+### Frontend
 
 ```bash
-# Download from https://ngrok.com/download then:
+cd duka-core/web
+
+npm install
+cp .env.example .env         # set VITE_API_BASE_URL=http://localhost:8000/api
+
+npm run dev                  # SPA on http://localhost:5173
+```
+
+Visit `http://localhost:5173/shop/test-business` to see the first storefront.
+
+### M-Pesa credentials (sandbox)
+
+You need Daraja sandbox values in your API `.env`:
+
+1. Create an account at **developer.safaricom.co.ke** and add a new app (check *Lipa Na M-Pesa Sandbox* + *M-Pesa Sandbox*).
+2. Copy the **Consumer Key** and **Consumer Secret**.
+3. From **developer.safaricom.co.ke/test_credentials**, copy the sandbox **Shortcode** (typically `174379`), **Passkey**, and the B2C **Initiator** + **Security Credential**.
+4. Run ngrok so Daraja can reach your local callbacks:
+
+```bash
 ngrok http 8000
 ```
 
-Copy the `https://xxxx.ngrok.io` URL and update your `.env`:
-```env
-MPESA_CALLBACK_URL=https://xxxx.ngrok.io/api/payments/callback
-MPESA_B2C_RESULT_URL=https://xxxx.ngrok.io/api/payments/b2c/result
-MPESA_B2C_TIMEOUT_URL=https://xxxx.ngrok.io/api/payments/b2c/timeout
+Then set the callback URLs in `.env` to your ngrok URL:
+
+```
+MPESA_CALLBACK_URL=https://xxxx.ngrok.io/api/webhooks/mpesa/stk
+MPESA_B2C_RESULT_URL=https://xxxx.ngrok.io/api/webhooks/mpesa/b2c/result
+MPESA_B2C_TIMEOUT_URL=https://xxxx.ngrok.io/api/webhooks/mpesa/b2c/timeout
 ```
 
-> ngrok gives a new URL every time you restart it. Remember to update `.env` each session.
+> ngrok issues a new URL each session — update `.env` when it changes.
 
-**Your final M-Pesa `.env` block:**
-```env
-MPESA_ENV=sandbox
-MPESA_CONSUMER_KEY=xxxxxxxxxxxxxxxx
-MPESA_CONSUMER_SECRET=xxxxxxxxxxxxxxxx
-MPESA_SHORTCODE=174379
-MPESA_PASSKEY=bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919
-MPESA_CALLBACK_URL=https://xxxx.ngrok.io/api/payments/callback
-MPESA_B2C_INITIATOR=testapi
-MPESA_B2C_SECURITY_CREDENTIAL=xxxxxxxxxxxxxxxx
-MPESA_B2C_RESULT_URL=https://xxxx.ngrok.io/api/payments/b2c/result
-MPESA_B2C_TIMEOUT_URL=https://xxxx.ngrok.io/api/payments/b2c/timeout
-```
+Full env reference is in `ARCHITECTURE.md`.
 
 ---
 
-### KRA eTIMS (Sandbox)
+## Repo layout
 
-eTIMS is Kenya Revenue Authority's electronic tax invoice system. Every sale must be reported to KRA in real time. Each business on the platform needs their own eTIMS credentials registered under their KRA PIN.
-
-**Step 1 — Sign up on the eTIMS sandbox portal**
-1. Go to [etims-sbx.kra.go.ke](https://etims-sbx.kra.go.ke)
-2. Click **Sign Up**
-3. Select **PIN** as the registration method
-4. Enter your test KRA PIN and complete the registration form
-5. Verify your phone number and email
-
-> For sandbox testing, you can use any properly formatted test PIN. For production, each business uses their actual registered KRA PIN.
-
-**Step 2 — Submit an OSCU Service Request**
-1. Log in to the sandbox portal
-2. Click **Service Request** (top right corner)
-3. Click **eTIMS** on the dialog that appears
-4. The service request form opens. Fill in:
-   - **eTIMS Type:** select **OSCU (Online Sales Control Unit)**
-   - OSCU is correct for duka-core — it is KRA-hosted and designed for online/API-based systems
-5. Submit the form and wait for approval (usually same day in sandbox)
-
-**Step 3 — Email KRA to request sandbox credentials**
-
-After submitting the service request, send this email:
-
-- **To:** timsupport@kra.go.ke
-- **Subject:** `Request for OSCU Sandbox Test Credentials - duka-core - PIN: [your PIN]`
-- **Body:**
-  > I am a developer building a multi-tenant e-commerce platform and need OSCU sandbox credentials to test eTIMS integration. I have submitted a service request on the eTIMS sandbox portal under PIN [your PIN]. Please provide sandbox test credentials and device serial.
-
-KRA will reply with a **device serial number** (e.g. `dvcv1130`) and authentication details. Store the device serial in the `etims_device_serial` column of the `businesses` table for the test business.
-
-**Step 4 — Initialize the OSCU device**
-
-Once you have credentials, run OSCU initialization. The app handles this via `EtimsService::initialize()`:
-
-```bash
-php artisan tinker
->>> $business = \App\Models\Business::where('slug', 'test-business')->first();
->>> app(\App\Services\EtimsService::class)->initialize($business);
 ```
-
-This calls KRA's initialization endpoint and stores the returned `cmc_key` (encrypted) against the business record. This key is required in all subsequent eTIMS API calls.
-
-**Step 5 — Set your eTIMS environment**
-```env
-ETIMS_ENV=sandbox
-```
-
-The app maps this to:
-- Sandbox: `https://etims-api-sbx.kra.go.ke`
-- Production: `https://etims-api.kra.go.ke`
-
-> **Going to production with eTIMS** requires a 6-phase KRA certification process: Sign Up → Simulation → Automated Testing → KYC Documentation → Verification Meeting → Go Live. For learning purposes, sandbox is sufficient.
-
----
-
-## Environment Variables Reference
-
-```env
-# Application
-APP_NAME=duka-core
-APP_ENV=local
-APP_KEY=                          # generated by: php artisan key:generate
-APP_DEBUG=true
-APP_URL=http://localhost:8000
-
-# Database
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=dukacore
-DB_USERNAME=postgres
-DB_PASSWORD=
-
-# Redis (sessions, cache, queues)
-REDIS_URL=redis://127.0.0.1:6379
-SESSION_DRIVER=redis
-SESSION_LIFETIME=120
-CACHE_STORE=redis
-QUEUE_CONNECTION=redis
-
-# M-Pesa Daraja API
-MPESA_ENV=sandbox
-MPESA_CONSUMER_KEY=
-MPESA_CONSUMER_SECRET=
-MPESA_SHORTCODE=
-MPESA_PASSKEY=
-MPESA_CALLBACK_URL=
-MPESA_B2C_INITIATOR=
-MPESA_B2C_SECURITY_CREDENTIAL=
-MPESA_B2C_RESULT_URL=
-MPESA_B2C_TIMEOUT_URL=
-
-# KRA eTIMS
-ETIMS_ENV=sandbox
-
-# Platform Admin
-PLATFORM_ADMIN_TOKEN=
+duka-core/
+  api/          Laravel 12 API
+  web/          React + Vite frontend
+  ARCHITECTURE.md
+  DESIGN.md
+  README.md
 ```
 
 ---
 
-## Want to Build Your Own Version?
+## Contributing
 
-Fork this repo and adapt it. Some ideas:
+Contributions are welcome — this is a learning project, so clear, well-explained PRs are valued as much as clever ones.
 
-- 🚗 **A ride-hailing backend** — replace products with ride requests, payments stay the same
-- 🏥 **A clinic booking system** — services instead of products, M-Pesa for deposits
-- 🎓 **A school fees platform** — multi-school tenancy, eTIMS for fee receipts
-- 🏠 **A property listings platform** — landlords as tenants, viewing fees via M-Pesa
+### Ground rules
 
-The core patterns — multi-tenancy, async M-Pesa payments, eTIMS compliance, automatic splits — apply to almost any Kenyan SaaS product. The commerce layer is just the implementation.
+1. **Read `ARCHITECTURE.md` and `DESIGN.md` first.** They are the source of truth. PRs that contradict the architecture (e.g. re-adding eTIMS, moving totals to the client, bypassing tenant scoping) will be asked to change.
+2. **Money code gets extra scrutiny.** Anything touching payments, splits, or callbacks must preserve the invariants below and ship with tests.
+3. **Small, focused PRs.** One concern per PR. A payout bugfix and a UI refactor are two PRs.
+
+### The invariants (do not break these)
+
+- **Tenant isolation:** no query in a tenant context may return another tenant's rows. Don't sidestep the `BelongsToTenant` global scope without an explicit, reviewed reason.
+- **Idempotency:** `mpesa_txn_id` and `mpesa_b2c_txn_id` are UNIQUE. A replayed callback must never double-pay or double-remit.
+- **Server-authoritative amounts:** order totals are always recomputed from product prices on the server. Never trust client-sent prices.
+- **One payout per paid order.**
+- **Callbacks are untrusted input** — validate before acting.
+
+### Workflow
+
+1. Fork the repo and create a branch: `feat/short-description` or `fix/short-description`.
+2. Make your change. Keep the diff tight.
+3. **Add or update tests** for anything money-related. Idempotency tests (replay each callback twice, assert no double-effect) are mandatory for callback changes.
+4. Run the checks locally before pushing:
+   ```bash
+   # api/
+   php artisan test
+   ./vendor/bin/pint          # PHP formatting (Laravel Pint)
+
+   # web/
+   npm run lint
+   npm run test               # if tests present
+   npm run build              # must build clean
+   ```
+5. Open a PR against `main`. Fill in the PR description: what changed, why, and how you tested it.
+
+### Commit style
+
+Conventional commits keep the history readable:
+
+```
+feat: add B2C timeout handling to ProcessRemittance
+fix: dedupe STK callbacks on webhook_events before status update
+docs: clarify tenant resolution in ARCHITECTURE
+refactor: extract split math into PaymentSplitService
+test: add idempotency test for replayed B2C result
+```
+
+### Code style
+
+- **PHP:** PSR-12 via Laravel Pint. Thin controllers, logic in services/jobs. Type-hint everything.
+- **TypeScript:** strict mode on. No `any` without a comment justifying it. Server state through TanStack Query, not ad-hoc `useEffect` fetches.
+- **UI:** follow `DESIGN.md`. One primary CTA per screen, tabular money, designed states for every async wait. PRs that reintroduce the anti-patterns listed there will be flagged.
+
+### What makes a great PR here
+
+Because this is a learning project, a strong PR explains its reasoning. If you fixed a subtle race in the payout flow, say what the race was and how you closed it. That write-up is part of the value.
+
+### Reporting issues
+
+Open an issue with: what you expected, what happened, steps to reproduce, and (for payment issues) the relevant `webhook_events` / order / payout state with any secrets redacted. **Never paste real credentials, live M-Pesa transaction data, or customer phone numbers into an issue.**
 
 ---
 
-## Project Status
+## Project status
 
-This project is being built in public as a learning exercise. See [BUILD_LOG.md](./BUILD_LOG.md) for a day-by-day account of what was built, what broke, and what was learned — written for a non-technical audience.
+Built in public as a learning exercise. The core patterns — multi-tenancy, async M-Pesa collect + payout, automatic splits — apply to almost any Kenyan SaaS product (ride-hailing, clinic bookings, school fees, property fees). The commerce layer is just the implementation.
 
----
+## Security
 
-## License
-
-MIT — use it, fork it, build on it. Credit appreciated but not required.
-
----
-
-*Built in Nairobi. Inspired by the gap between what Kenyan developers learn in tutorials and what real production systems look like.*
+If you find a vulnerability — especially anything that could misroute money or leak another tenant's data — please report it privately to the maintainer rather than opening a public issue.
