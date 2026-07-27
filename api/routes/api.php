@@ -13,8 +13,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me', [AuthController::class, 'me']);
 
-    Route::middleware('tenant.user')->prefix('dashboard')->group(function () {
-        Route::get('/products', [ProductController::class, 'index']);
+    Route::middleware('tenant.user')->prefix('dashboard')->name('dashboard.')->group(function () {
+        Route::apiResource('products', ProductController::class);
         Route::get('/orders', [OrderController::class, 'index']);
     });
 });
