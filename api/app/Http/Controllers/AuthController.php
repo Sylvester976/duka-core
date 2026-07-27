@@ -9,6 +9,13 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    /**
+     * A real bcrypt hash with no matching password, so a login attempt for an
+     * unknown email still pays the cost of Hash::check() instead of failing
+     * instantly — otherwise response timing would leak which emails exist.
+     */
+    private const DUMMY_HASH = '$2y$12$ZJdmItBfHZ/5bhCvJOipce/864zB.AbK4vukF4USTUb.kQ3t/8QT.';
+
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -18,7 +25,12 @@ class AuthController extends Controller
 
         $user = User::where('email', $credentials['email'])->first();
 
-        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+        // Hash::check always runs, even for an unknown email, so a missing
+        // user and a wrong password take the same amount of time to reject —
+        // otherwise the response timing would leak which emails are registered.
+        $validPassword = Hash::check($credentials['password'], $user->password ?? self::DUMMY_HASH);
+
+        if (! $user || ! $validPassword) {
             throw ValidationException::withMessages([
                 'email' => ['These credentials do not match our records.'],
             ]);
