@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureUserHasTenant;
+use App\Http\Middleware\ResolveTenantFromSlug;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'tenant.user' => EnsureUserHasTenant::class,
+            'tenant.slug' => ResolveTenantFromSlug::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

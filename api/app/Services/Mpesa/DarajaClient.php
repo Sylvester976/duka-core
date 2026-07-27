@@ -109,6 +109,12 @@ class DarajaClient
             throw new DarajaRequestException('Daraja request failed: '.$response->body());
         }
 
-        return $response->json();
+        $data = $response->json();
+
+        if (isset($data['ResponseCode']) && (string) $data['ResponseCode'] !== '0') {
+            throw new DarajaRequestException('Daraja rejected the request: '.$response->body());
+        }
+
+        return $data;
     }
 }
