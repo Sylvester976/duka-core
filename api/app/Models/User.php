@@ -10,13 +10,14 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 #[Fillable(['tenant_id', 'name', 'email', 'password', 'role'])]
 #[Hidden(['password'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use BelongsToTenant, HasFactory, HasUuids, Notifiable;
+    use BelongsToTenant, HasApiTokens, HasFactory, HasUuids, Notifiable;
 
     protected function casts(): array
     {
