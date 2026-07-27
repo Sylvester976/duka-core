@@ -13,6 +13,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // No login page exists (API-only). Without this, Laravel's default
+        // guest-redirect middleware config falls back to route('login'),
+        // which doesn't exist, turning every unauthenticated request into a
+        // 500 instead of a 401 whenever the client omits an explicit
+        // Accept: application/json header.
+        $middleware->redirectGuestsTo(fn () => null);
+
         $middleware->throttleApi();
 
         $middleware->alias([
@@ -21,5 +28,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // API-only app: there is no login page or Blade view to redirect to,
+        // so every exception (including unauthenticated 401s) must render as
+        // JSON — otherwise Laravel tries to redirect to a nonexistent 'login'
+        // named route for any request that doesn't send Accept: application/json.
+        $exceptions->shouldRenderJsonWhen(fn () => true);
     })->create();

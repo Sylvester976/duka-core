@@ -2,7 +2,10 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Dashboard\OrderController;
+use App\Http\Controllers\Dashboard\OverviewController;
+use App\Http\Controllers\Dashboard\PayoutController;
 use App\Http\Controllers\Dashboard\ProductController;
+use App\Http\Controllers\Dashboard\TenantController;
 use App\Http\Controllers\Storefront\CheckoutController;
 use App\Http\Controllers\Storefront\OrderStatusController;
 use App\Http\Controllers\Storefront\StorefrontController;
@@ -20,8 +23,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
 
     Route::middleware('tenant.user')->prefix('dashboard')->name('dashboard.')->group(function () {
+        Route::get('/overview', [OverviewController::class, 'index']);
         Route::apiResource('products', ProductController::class);
         Route::get('/orders', [OrderController::class, 'index']);
+        Route::get('/orders/{order}', [OrderController::class, 'show']);
+        Route::get('/payouts', [PayoutController::class, 'index']);
+        Route::get('/settings', [TenantController::class, 'show']);
+        Route::put('/settings', [TenantController::class, 'update']);
     });
 });
 
