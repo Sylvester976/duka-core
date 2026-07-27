@@ -6,6 +6,6 @@ const formatter = new Intl.NumberFormat('en-KE', {
   maximumFractionDigits: 2,
 })
 
-export function formatKES(amount: number) {
-  return formatter.format(amount)
+export function formatKES(amount: number | string) {
+  return formatter.format(typeof amount === 'string' ? Number(amount) : amount)
 }
