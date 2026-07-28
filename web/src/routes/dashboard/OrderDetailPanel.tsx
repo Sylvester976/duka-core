@@ -1,24 +1,21 @@
 import { useDashboardOrder } from '../../api/dashboard'
 import { StatusBadge } from '../../components/ui/Badge'
+import { Sheet } from '../../components/ui/Sheet'
 import { formatKES } from '../../lib/formatKES'
 
 export function OrderDetailPanel({ orderId, onClose }: { orderId: string | null; onClose: () => void }) {
   const { data: order, isPending } = useDashboardOrder(orderId ?? '')
 
-  if (!orderId) return null
-
   return (
-    <div className="fixed inset-0 z-30 flex justify-end">
-      <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 bg-black/40" />
-      <div className="relative z-10 flex h-full w-full max-w-sm flex-col overflow-y-auto bg-surface p-5">
-        {isPending || !order ? (
-          <p className="text-text-muted">Loading…</p>
-        ) : (
-          <>
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Order</h2>
-              <StatusBadge status={order.status} />
-            </div>
+    <Sheet open={!!orderId} onClose={onClose}>
+      {isPending || !order ? (
+        <p className="text-text-muted">Loading…</p>
+      ) : (
+        <>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="font-serif text-lg">Order</h2>
+            <StatusBadge status={order.status} />
+          </div>
 
             <p className="mb-1 text-sm text-text-muted">Customer</p>
             <p className="mb-4 text-sm">{order.customer_msisdn}</p>
@@ -65,7 +62,6 @@ export function OrderDetailPanel({ orderId, onClose }: { orderId: string | null;
             )}
           </>
         )}
-      </div>
-    </div>
+    </Sheet>
   )
 }

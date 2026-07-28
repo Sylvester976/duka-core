@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useDashboardProducts, useDeleteProduct, useUpdateProduct, type Product } from '../../api/dashboard'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
+import { Switch } from '../../components/ui/Switch'
 import { formatKES } from '../../lib/formatKES'
 import { ProductFormPanel } from './ProductFormPanel'
 
@@ -17,7 +18,7 @@ export function Products() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Products</h1>
+        <h1 className="font-serif text-2xl">Products</h1>
         <Button type="button" onClick={() => setPanel({ open: true, product: null })}>
           Add product
         </Button>
@@ -39,16 +40,11 @@ export function Products() {
                 <td className="px-4 py-2.5">{product.name}</td>
                 <td className="px-4 py-2.5 tabular-nums">{formatKES(product.price)}</td>
                 <td className="px-4 py-2.5">
-                  <button
-                    type="button"
-                    onClick={() => updateProduct.mutate({ id: product.id, is_active: !product.is_active })}
+                  <Switch
+                    checked={product.is_active}
+                    onChange={(checked) => updateProduct.mutate({ id: product.id, is_active: checked })}
                     aria-label={`Toggle ${product.name} active`}
-                    className={`h-5 w-9 rounded-full transition-colors ${product.is_active ? 'bg-brand' : 'bg-surface-2'}`}
-                  >
-                    <span
-                      className={`block h-4 w-4 rounded-full bg-white transition-transform ${product.is_active ? 'translate-x-4' : 'translate-x-0.5'}`}
-                    />
-                  </button>
+                  />
                 </td>
                 <td className="px-4 py-2.5 text-right">
                   <button

@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useDashboardOrders } from '../../api/dashboard'
 import { StatusBadge } from '../../components/ui/Badge'
+import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
+import { cn } from '../../lib/cn'
 import { formatKES } from '../../lib/formatKES'
 import { OrderDetailPanel } from './OrderDetailPanel'
 
@@ -14,20 +16,19 @@ export function Orders() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold">Orders</h1>
+      <h1 className="mb-4 font-serif text-2xl">Orders</h1>
 
       <div className="mb-4 flex gap-2">
         {STATUS_FILTERS.map((status) => (
-          <button
+          <Button
             key={status}
             type="button"
+            variant={filter === status ? 'primary' : 'ghost'}
             onClick={() => setFilter(status)}
-            className={`rounded-full px-3 py-1 text-sm font-medium capitalize ${
-              filter === status ? 'bg-brand text-brand-contrast' : 'text-text-muted hover:text-text'
-            }`}
+            className={cn('min-h-9 px-3 py-1 text-sm capitalize', filter !== status && 'hover:text-text')}
           >
             {status}
-          </button>
+          </Button>
         ))}
       </div>
 
