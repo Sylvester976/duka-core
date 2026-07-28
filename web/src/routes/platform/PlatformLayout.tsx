@@ -11,8 +11,8 @@ export function PlatformLayout() {
   const { user, logout } = useAuth()
 
   return (
-    <div className="flex min-h-dvh bg-bg text-text">
-      <aside className="flex w-64 shrink-0 flex-col border-r border-border p-6">
+    <div className="flex min-h-dvh text-text">
+      <aside className="flex w-64 shrink-0 flex-col border-r border-border bg-surface p-6">
         <p className="mb-8 font-serif text-lg">duka-core</p>
         <p className="mb-1 truncate text-sm font-medium text-text-muted">{user?.name}</p>
         <p className="mb-6 text-xs uppercase tracking-wide text-text-subtle">Platform admin</p>

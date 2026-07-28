@@ -27,14 +27,14 @@ function StorePageContent() {
 
   if (isError || !tenant) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-bg px-6 text-center">
+      <div className="flex min-h-dvh items-center justify-center px-6 text-center">
         <p className="text-text-muted">This store isn't available right now.</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-dvh bg-bg text-text">
+    <div className="min-h-dvh text-text">
       <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-border bg-bg/95 px-4 py-3 backdrop-blur">
         {tenant.brand_logo_url ? (
           <img
@@ -86,7 +86,7 @@ function StorePageContent() {
 
 function StorePageSkeleton() {
   return (
-    <div className="min-h-dvh bg-bg p-4">
+    <div className="min-h-dvh p-4">
       <div className="mb-4 flex items-center gap-3">
         <div className="h-9 w-9 animate-pulse rounded-full bg-surface-2" />
         <div className="h-4 w-32 animate-pulse rounded-[var(--radius)] bg-surface-2" />

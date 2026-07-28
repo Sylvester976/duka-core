@@ -48,7 +48,8 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+  background: linear-gradient(135deg, #f2e9d6 0%, #f7f4ee 45%, #fdfcf9 100%);
+  background-attachment: fixed;
   color: var(--text);
   font-family: var(--font-sans);
   font-variant-numeric: tabular-nums;

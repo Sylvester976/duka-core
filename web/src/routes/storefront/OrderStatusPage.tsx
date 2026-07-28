@@ -19,7 +19,7 @@ export function OrderStatusPage() {
   }, [tenant?.brand_primary])
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-bg px-6 text-center text-text">
+    <div className="flex min-h-dvh flex-col items-center justify-center px-6 text-center text-text">
       {isPending || !order ? (
         <p className="text-text-muted">Loading…</p>
       ) : order.status === 'pending' ? (
