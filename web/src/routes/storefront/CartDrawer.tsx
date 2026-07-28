@@ -1,4 +1,5 @@
 import { Button } from '../../components/ui/Button'
+import { Sheet } from '../../components/ui/Sheet'
 import { useCart } from '../../lib/cart'
 import { formatKES } from '../../lib/formatKES'
 
@@ -11,21 +12,9 @@ interface CartDrawerProps {
 export function CartDrawer({ open, onClose, onCheckout }: CartDrawerProps) {
   const { items, updateQuantity, subtotal } = useCart()
 
-  if (!open) return null
-
   return (
-    <div className="fixed inset-0 z-30 flex items-end">
-      <button
-        type="button"
-        aria-label="Close cart"
-        onClick={onClose}
-        className="absolute inset-0 bg-black/40"
-      />
-      <div className="relative z-10 max-h-[80dvh] w-full overflow-y-auto rounded-t-[14px] bg-surface p-4">
-        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-border" />
-        <h2 className="mb-3 text-lg font-semibold">Your cart</h2>
-
-        {items.length === 0 ? (
+    <Sheet open={open} onClose={onClose} side="bottom" title="Your cart">
+      {items.length === 0 ? (
           <p className="py-8 text-center text-text-muted">Your cart is empty.</p>
         ) : (
           <ul className="space-y-3">
@@ -70,7 +59,6 @@ export function CartDrawer({ open, onClose, onCheckout }: CartDrawerProps) {
             </Button>
           </div>
         )}
-      </div>
-    </div>
+    </Sheet>
   )
 }

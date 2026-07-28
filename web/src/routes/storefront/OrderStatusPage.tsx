@@ -25,7 +25,7 @@ export function OrderStatusPage() {
       ) : order.status === 'pending' ? (
         <>
           <div className="mb-6 h-16 w-16 animate-pulse rounded-full bg-brand/20" />
-          <h1 className="mb-2 text-xl font-semibold">Check your phone</h1>
+          <h1 className="mb-2 font-serif text-2xl">Check your phone</h1>
           <p className="max-w-xs text-text-muted">
             Enter your M-Pesa PIN to confirm {formatKES(order.amount)}
             {tenant ? ` to ${tenant.name}` : ''}.
@@ -37,16 +37,16 @@ export function OrderStatusPage() {
             <svg
               viewBox="0 0 24 24"
               fill="none"
-              stroke="white"
+              stroke="currentColor"
               strokeWidth="3"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="h-8 w-8"
+              className="h-8 w-8 text-bg"
             >
               <path d="M20 6 9 17l-5-5" />
             </svg>
           </div>
-          <h1 className="mb-2 text-xl font-semibold">Payment received</h1>
+          <h1 className="mb-2 font-serif text-2xl">Payment received</h1>
           <p className="mb-1 text-text-muted">Thank you!</p>
           <p className="mb-6 font-semibold tabular-nums">{formatKES(order.amount)}</p>
           <p className="text-xs text-text-subtle">Order ref: {order.id}</p>
@@ -66,7 +66,7 @@ export function OrderStatusPage() {
               <path d="M18 6 6 18M6 6l12 12" />
             </svg>
           </div>
-          <h1 className="mb-2 text-xl font-semibold">
+          <h1 className="mb-2 font-serif text-2xl">
             {order.status === 'expired' ? 'Payment expired' : 'Payment failed'}
           </h1>
           <p className="mb-6 text-text-muted">No charge was made. You can try again.</p>
