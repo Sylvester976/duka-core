@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { useStorefront } from '../../api/storefront'
 import { CartProvider, useCart } from '../../lib/cart'
-import { applyBrandTokens } from '../../lib/theme'
+import { applyBrandTokens, resetBrandTokens } from '../../lib/theme'
 import { CartDrawer } from './CartDrawer'
 import { CheckoutModal } from './CheckoutModal'
 import { ProductGrid } from './ProductGrid'
@@ -18,6 +18,7 @@ function StorePageContent() {
     if (tenant?.brand_primary) {
       applyBrandTokens(tenant.brand_primary)
     }
+    return resetBrandTokens
   }, [tenant?.brand_primary])
 
   if (isPending) {
@@ -33,7 +34,7 @@ function StorePageContent() {
   }
 
   return (
-    <div className="storefront-theme min-h-dvh bg-bg text-text">
+    <div className="min-h-dvh bg-bg text-text">
       <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-border bg-bg/95 px-4 py-3 backdrop-blur">
         {tenant.brand_logo_url ? (
           <img

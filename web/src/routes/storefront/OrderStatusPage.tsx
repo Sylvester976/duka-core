@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router'
 import { useOrderStatus, useStorefront } from '../../api/storefront'
 import { Button } from '../../components/ui/Button'
 import { formatKES } from '../../lib/formatKES'
-import { applyBrandTokens } from '../../lib/theme'
+import { applyBrandTokens, resetBrandTokens } from '../../lib/theme'
 
 export function OrderStatusPage() {
   const { slug = '', orderId = '' } = useParams()
@@ -15,10 +15,11 @@ export function OrderStatusPage() {
     if (tenant?.brand_primary) {
       applyBrandTokens(tenant.brand_primary)
     }
+    return resetBrandTokens
   }, [tenant?.brand_primary])
 
   return (
-    <div className="storefront-theme flex min-h-dvh flex-col items-center justify-center bg-bg px-6 text-center text-text">
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-bg px-6 text-center text-text">
       {isPending || !order ? (
         <p className="text-text-muted">Loading…</p>
       ) : order.status === 'pending' ? (

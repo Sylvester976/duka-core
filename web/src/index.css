@@ -1,37 +1,29 @@
 @import "tailwindcss";
 
+/*
+ * One warm, near-monochrome palette across storefront, dashboard, and platform
+ * admin (DESIGN.md's Aesop-inspired direction). --brand/--brand-contrast are a
+ * fixed ink accent everywhere except the storefront, which overrides them per
+ * tenant at runtime via applyBrandTokens (see lib/theme.ts).
+ */
 :root {
-  --bg: #0a0a0a;
-  --surface: #141414;
-  --surface-2: #1c1c1c;
-  --border: #262626;
-  --text: #fafafa;
-  --text-muted: #a1a1aa;
-  --text-subtle: #71717a;
-  --brand: #16a34a;
-  --brand-hover: #15803d;
-  --brand-contrast: #fafafa;
-  --danger: #ef4444;
-  --warning: #f59e0b;
-  --success: #22c55e;
-  --radius: 10px;
+  --bg: #f7f4ee;
+  --surface: #ffffff;
+  --surface-2: #eee9df;
+  --border: #dedacc;
+  --text: #2a2722;
+  --text-muted: #6b6559;
+  --text-subtle: #9c9686;
+  --brand: #2a2722;
+  --brand-hover: #45413a;
+  --brand-contrast: #f7f4ee;
+  --danger: #b3402b;
+  --warning: #a6752b;
+  --success: #4b6b4e;
+  --radius: 2px;
+  --radius-lg: 4px;
   --font-serif: 'Fraunces', ui-serif, Georgia, serif;
   --font-sans: 'Public Sans', ui-sans-serif, system-ui, sans-serif;
-}
-
-/*
- * The dashboard uses the dark tokens above as-is (DESIGN.md's "fixed" dashboard
- * palette). The storefront is a separate surface with its own light palette;
- * --brand / --brand-contrast stay dynamic (set per-tenant via applyBrandTokens).
- */
-.storefront-theme {
-  --bg: #ffffff;
-  --surface: #ffffff;
-  --surface-2: #f4f4f5;
-  --border: #e4e4e7;
-  --text: #0a0a0a;
-  --text-muted: #52525b;
-  --text-subtle: #71717a;
 }
 
 @theme inline {
@@ -49,6 +41,7 @@
   --color-warning: var(--warning);
   --color-success: var(--success);
   --radius-DEFAULT: var(--radius);
+  --radius-lg: var(--radius-lg);
   --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
 }
