@@ -1,13 +1,13 @@
 import { cn } from '../../lib/cn'
 
 const STATUS_STYLES: Record<string, string> = {
-  pending: 'bg-warning/15 text-warning',
-  processing: 'bg-warning/15 text-warning',
-  paid: 'bg-success/15 text-success',
-  failed: 'bg-danger/15 text-danger',
-  expired: 'bg-surface-2 text-text-subtle',
-  active: 'bg-success/15 text-success',
-  suspended: 'bg-danger/15 text-danger',
+  pending: 'text-warning',
+  processing: 'text-warning',
+  paid: 'text-success',
+  failed: 'text-danger',
+  expired: 'text-text-subtle',
+  active: 'text-success',
+  suspended: 'text-danger',
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -24,8 +24,8 @@ export function StatusBadge({ status }: { status: string }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
-        STATUS_STYLES[status] ?? 'bg-surface-2 text-text-subtle',
+        'inline-flex items-center rounded-[var(--radius)] border border-current/25 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide',
+        STATUS_STYLES[status] ?? 'text-text-subtle',
       )}
     >
       {STATUS_LABELS[status] ?? status}
