@@ -6,6 +6,8 @@ use App\Http\Controllers\Dashboard\OverviewController;
 use App\Http\Controllers\Dashboard\PayoutController;
 use App\Http\Controllers\Dashboard\ProductController;
 use App\Http\Controllers\Dashboard\TenantController;
+use App\Http\Controllers\Platform\PlatformOverviewController;
+use App\Http\Controllers\Platform\PlatformTenantController;
 use App\Http\Controllers\Storefront\CheckoutController;
 use App\Http\Controllers\Storefront\OrderStatusController;
 use App\Http\Controllers\Storefront\StorefrontController;
@@ -30,6 +32,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/payouts', [PayoutController::class, 'index']);
         Route::get('/settings', [TenantController::class, 'show']);
         Route::put('/settings', [TenantController::class, 'update']);
+    });
+
+    Route::middleware('platform.admin')->prefix('platform')->name('platform.')->group(function () {
+        Route::get('/overview', [PlatformOverviewController::class, 'index']);
+        Route::get('/tenants', [PlatformTenantController::class, 'index']);
+        Route::get('/tenants/{tenant}', [PlatformTenantController::class, 'show']);
+        Route::patch('/tenants/{tenant}/status', [PlatformTenantController::class, 'updateStatus']);
     });
 });
 

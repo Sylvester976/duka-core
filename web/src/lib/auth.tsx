@@ -12,7 +12,7 @@ export interface DashboardUser {
 interface AuthContextValue {
   user: DashboardUser | null
   isLoading: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string) => Promise<DashboardUser>
   logout: () => Promise<void>
 }
 
@@ -43,6 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
     localStorage.setItem('auth_token', data.token)
     setUser(data.user)
+    return data.user
   }
 
   const logout = async () => {

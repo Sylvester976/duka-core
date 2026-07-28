@@ -6,6 +6,8 @@ const STATUS_STYLES: Record<string, string> = {
   paid: 'bg-success/15 text-success',
   failed: 'bg-danger/15 text-danger',
   expired: 'bg-surface-2 text-text-subtle',
+  active: 'bg-success/15 text-success',
+  suspended: 'bg-danger/15 text-danger',
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -14,6 +16,8 @@ const STATUS_LABELS: Record<string, string> = {
   paid: 'Paid',
   failed: 'Failed',
   expired: 'Expired',
+  active: 'Active',
+  suspended: 'Suspended',
 }
 
 export function StatusBadge({ status }: { status: string }) {

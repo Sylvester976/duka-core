@@ -17,8 +17,8 @@ export function Login() {
     setIsSubmitting(true)
 
     try {
-      await login(email, password)
-      navigate('/dashboard')
+      const user = await login(email, password)
+      navigate(user.role === 'platform_admin' ? '/platform' : '/dashboard')
     } catch {
       setError('Incorrect email or password.')
     } finally {
