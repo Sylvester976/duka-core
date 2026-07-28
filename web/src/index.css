@@ -15,6 +15,8 @@
   --warning: #f59e0b;
   --success: #22c55e;
   --radius: 10px;
+  --font-serif: 'Fraunces', ui-serif, Georgia, serif;
+  --font-sans: 'Public Sans', ui-sans-serif, system-ui, sans-serif;
 }
 
 /*
@@ -47,12 +49,15 @@
   --color-warning: var(--warning);
   --color-success: var(--success);
   --radius-DEFAULT: var(--radius);
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
 }
 
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
+  font-family: var(--font-sans);
   font-variant-numeric: tabular-nums;
 }
 
