@@ -69,6 +69,33 @@ export function usePlatformTenant(id: string) {
   })
 }
 
+export interface CreateTenantPayload {
+  name: string
+  slug: string
+  brand_primary: string
+  platform_fee_percent: number
+  monthly_fee: number
+  mpesa_shortcode?: string | null
+  mpesa_b2c_msisdn?: string | null
+  owner_name: string
+  owner_email: string
+  owner_password: string
+}
+
+export function useCreateTenant() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: CreateTenantPayload) => {
+      const { data } = await apiClient.post<PlatformTenant>('/platform/tenants', payload)
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['platform', 'tenants'] })
+      queryClient.invalidateQueries({ queryKey: ['platform', 'overview'] })
+    },
+  })
+}
+
 export function useUpdateTenantStatus() {
   const queryClient = useQueryClient()
   return useMutation({

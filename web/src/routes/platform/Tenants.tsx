@@ -1,17 +1,25 @@
 import { useState } from 'react'
 import { usePlatformTenants } from '../../api/platform'
 import { StatusBadge } from '../../components/ui/Badge'
+import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { formatKES } from '../../lib/formatKES'
 import { TenantDetailPanel } from './TenantDetailPanel'
+import { TenantFormPanel } from './TenantFormPanel'
 
 export function Tenants() {
   const { data: tenants, isPending } = usePlatformTenants()
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [formOpen, setFormOpen] = useState(false)
 
   return (
     <div>
-      <h1 className="mb-6 font-serif text-2xl">Tenants</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="font-serif text-2xl">Tenants</h1>
+        <Button type="button" onClick={() => setFormOpen(true)}>
+          New tenant
+        </Button>
+      </div>
 
       <Card className="overflow-hidden p-0">
         <table className="w-full text-sm">
@@ -55,6 +63,7 @@ export function Tenants() {
       </Card>
 
       <TenantDetailPanel tenantId={selectedId} onClose={() => setSelectedId(null)} />
+      <TenantFormPanel open={formOpen} onClose={() => setFormOpen(false)} />
     </div>
   )
 }

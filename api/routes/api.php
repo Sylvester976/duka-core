@@ -37,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('platform.admin')->prefix('platform')->name('platform.')->group(function () {
         Route::get('/overview', [PlatformOverviewController::class, 'index']);
         Route::get('/tenants', [PlatformTenantController::class, 'index']);
+        Route::post('/tenants', [PlatformTenantController::class, 'store']);
         Route::get('/tenants/{tenant}', [PlatformTenantController::class, 'show']);
         Route::patch('/tenants/{tenant}/status', [PlatformTenantController::class, 'updateStatus']);
     });
