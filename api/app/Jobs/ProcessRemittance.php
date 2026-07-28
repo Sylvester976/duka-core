@@ -45,6 +45,7 @@ class ProcessRemittance implements ShouldQueue
 
             try {
                 $payout = Payout::create([
+                    'tenant_id' => $tenant->id,
                     'order_id' => $this->order->id,
                     'gross_amount' => $split['gross_amount'],
                     'platform_fee' => $split['platform_fee'],
