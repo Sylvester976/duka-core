@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { useCheckout } from '../../api/storefront'
 import { Button } from '../../components/ui/Button'
 import { useCart } from '../../lib/cart'

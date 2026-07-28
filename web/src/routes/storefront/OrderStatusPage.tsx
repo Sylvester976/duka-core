@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router'
 import { useOrderStatus, useStorefront } from '../../api/storefront'
 import { Button } from '../../components/ui/Button'
 import { formatKES } from '../../lib/formatKES'

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 import { useStorefront } from '../../api/storefront'
 import { CartProvider, useCart } from '../../lib/cart'
 import { applyBrandTokens } from '../../lib/theme'

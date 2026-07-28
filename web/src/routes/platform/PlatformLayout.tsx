@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet } from 'react-router'
 import { cn } from '../../lib/cn'
 import { useAuth } from '../../lib/auth'
 
