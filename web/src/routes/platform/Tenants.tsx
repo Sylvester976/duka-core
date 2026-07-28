@@ -11,7 +11,7 @@ export function Tenants() {
 
   return (
     <div>
-      <h1 className="mb-6 text-xl font-semibold">Tenants</h1>
+      <h1 className="mb-6 font-serif text-2xl">Tenants</h1>
 
       <Card className="overflow-hidden p-0">
         <table className="w-full text-sm">

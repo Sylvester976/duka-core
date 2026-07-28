@@ -8,7 +8,7 @@ export function PlatformOverview() {
 
   return (
     <div>
-      <h1 className="mb-6 text-xl font-semibold">Platform overview</h1>
+      <h1 className="mb-6 font-serif text-2xl">Platform overview</h1>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatCard label="Tenants" value={overview ? String(overview.tenants_total) : '—'} loading={isPending} />

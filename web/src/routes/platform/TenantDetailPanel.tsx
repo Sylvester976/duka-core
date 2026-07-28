@@ -1,26 +1,23 @@
 import { usePlatformTenant, useUpdateTenantStatus } from '../../api/platform'
 import { StatusBadge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
+import { Sheet } from '../../components/ui/Sheet'
 import { formatKES } from '../../lib/formatKES'
 
 export function TenantDetailPanel({ tenantId, onClose }: { tenantId: string | null; onClose: () => void }) {
   const { data, isPending } = usePlatformTenant(tenantId ?? '')
   const updateStatus = useUpdateTenantStatus()
 
-  if (!tenantId) return null
-
   return (
-    <div className="fixed inset-0 z-30 flex justify-end">
-      <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 bg-black/40" />
-      <div className="relative z-10 flex h-full w-full max-w-sm flex-col overflow-y-auto bg-surface p-5">
-        {isPending || !data ? (
-          <p className="text-text-muted">Loading…</p>
-        ) : (
-          <>
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">{data.tenant.name}</h2>
-              <StatusBadge status={data.tenant.status} />
-            </div>
+    <Sheet open={!!tenantId} onClose={onClose}>
+      {isPending || !data ? (
+        <p className="text-text-muted">Loading…</p>
+      ) : (
+        <>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="font-serif text-lg">{data.tenant.name}</h2>
+            <StatusBadge status={data.tenant.status} />
+          </div>
 
             <p className="mb-1 text-sm text-text-muted">Slug</p>
             <p className="mb-4 text-sm">{data.tenant.slug}</p>
@@ -62,7 +59,6 @@ export function TenantDetailPanel({ tenantId, onClose }: { tenantId: string | nu
             </div>
           </>
         )}
-      </div>
-    </div>
+    </Sheet>
   )
 }
