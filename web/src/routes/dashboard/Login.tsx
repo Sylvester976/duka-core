@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router'
 import { Button } from '../../components/ui/Button'
+import { Input } from '../../components/ui/Input'
 import { useAuth } from '../../lib/auth'
 
 export function Login() {
@@ -30,33 +31,28 @@ export function Login() {
     <div className="flex min-h-dvh items-center justify-center bg-bg px-4 text-text">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-[var(--radius)] border border-border bg-surface p-6"
+        className="w-full max-w-sm rounded-[var(--radius)] border border-border bg-surface p-8"
       >
-        <h1 className="mb-1 text-lg font-semibold">Sign in</h1>
-        <p className="mb-6 text-sm text-text-muted">duka-core business dashboard</p>
+        <p className="mb-6 font-serif text-lg">duka-core</p>
+        <h1 className="mb-1 font-serif text-xl">Sign in</h1>
+        <p className="mb-6 text-sm text-text-muted">Business dashboard</p>
 
-        <label className="mb-1 block text-sm font-medium" htmlFor="email">
-          Email
-        </label>
-        <input
+        <Input
+          label="Email"
           id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="mb-4 w-full rounded-[var(--radius)] border border-border bg-transparent px-3 py-2.5 text-sm outline-none focus:border-brand"
         />
 
-        <label className="mb-1 block text-sm font-medium" htmlFor="password">
-          Password
-        </label>
-        <input
+        <Input
+          label="Password"
           id="password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="mb-4 w-full rounded-[var(--radius)] border border-border bg-transparent px-3 py-2.5 text-sm outline-none focus:border-brand"
         />
 
         {error && <p className="mb-4 text-sm text-danger">{error}</p>}

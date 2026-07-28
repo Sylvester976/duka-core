@@ -15,8 +15,9 @@ export function DashboardLayout() {
 
   return (
     <div className="flex min-h-dvh bg-bg text-text">
-      <aside className="flex w-56 shrink-0 flex-col border-r border-border p-4">
-        <p className="mb-6 truncate text-sm font-semibold">{user?.name}</p>
+      <aside className="flex w-64 shrink-0 flex-col border-r border-border p-6">
+        <p className="mb-8 font-serif text-lg">duka-core</p>
+        <p className="mb-6 truncate text-sm font-medium text-text-muted">{user?.name}</p>
         <nav className="flex flex-1 flex-col gap-1">
           {NAV_ITEMS.map((item) => (
             <NavLink
@@ -25,7 +26,7 @@ export function DashboardLayout() {
               end={item.end}
               className={({ isActive }) =>
                 cn(
-                  'rounded-[var(--radius)] px-3 py-2 text-sm font-medium text-text-muted transition-colors hover:text-text',
+                  'rounded-[var(--radius)] px-3 py-2 text-xs font-medium uppercase tracking-wide text-text-muted transition-colors hover:text-text',
                   isActive && 'bg-surface-2 text-text',
                 )
               }
@@ -37,12 +38,12 @@ export function DashboardLayout() {
         <button
           type="button"
           onClick={() => logout()}
-          className="rounded-[var(--radius)] px-3 py-2 text-left text-sm text-text-muted hover:text-text"
+          className="rounded-[var(--radius)] px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-text-muted hover:text-text"
         >
           Log out
         </button>
       </aside>
-      <main className="flex-1 overflow-y-auto p-6">
+      <main className="flex-1 overflow-y-auto p-8">
         <Outlet />
       </main>
     </div>
