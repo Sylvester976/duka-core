@@ -3,17 +3,38 @@ import { useDashboardOrders } from '../../api/dashboard'
 import { StatusBadge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
+import { Pagination } from '../../components/ui/Pagination'
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '../../components/ui/Table'
 import { cn } from '../../lib/cn'
 import { formatKES } from '../../lib/formatKES'
 import { OrderDetailPanel } from './OrderDetailPanel'
 
 const STATUS_FILTERS = ['all', 'pending', 'paid', 'failed', 'expired'] as const
 
+type SortColumn = 'amount' | 'status' | 'created_at'
+type SortState = { column: SortColumn; direction: 'asc' | 'desc' } | null
+
 export function Orders() {
   const [filter, setFilter] = useState<(typeof STATUS_FILTERS)[number]>('all')
-  const { data: ordersPage, isPending } = useDashboardOrders(filter === 'all' ? {} : { status: filter })
+  const [page, setPage] = useState(1)
+  const [sort, setSort] = useState<SortState>(null)
+  const { data: ordersPage, isPending } = useDashboardOrders({
+    status: filter === 'all' ? undefined : filter,
+    page,
+    sort: sort?.column,
+    direction: sort?.direction,
+  })
   const orders = ordersPage?.data
   const [selectedId, setSelectedId] = useState<string | null>(null)
+
+  function toggleSort(column: SortColumn) {
+    setPage(1)
+    setSort((current) => {
+      if (current?.column !== column) return { column, direction: 'asc' }
+      if (current.direction === 'asc') return { column, direction: 'desc' }
+      return null
+    })
+  }
 
   return (
     <div>
@@ -25,7 +46,10 @@ export function Orders() {
             key={status}
             type="button"
             variant={filter === status ? 'primary' : 'ghost'}
-            onClick={() => setFilter(status)}
+            onClick={() => {
+              setFilter(status)
+              setPage(1)
+            }}
             className={cn('min-h-9 px-3 py-1 text-sm capitalize', filter !== status && 'hover:text-text')}
           >
             {status}
@@ -34,29 +58,47 @@ export function Orders() {
       </div>
 
       <Card className="overflow-hidden p-0">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border text-left text-text-subtle">
-              <th className="px-4 py-2 font-medium">Customer</th>
-              <th className="px-4 py-2 font-medium">Amount</th>
-              <th className="px-4 py-2 font-medium">Status</th>
-              <th className="px-4 py-2 font-medium">Date</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableHeaderCell>Customer</TableHeaderCell>
+              <TableHeaderCell
+                sortable
+                sortDirection={sort?.column === 'amount' ? sort.direction : null}
+                onSort={() => toggleSort('amount')}
+              >
+                Amount
+              </TableHeaderCell>
+              <TableHeaderCell
+                sortable
+                sortDirection={sort?.column === 'status' ? sort.direction : null}
+                onSort={() => toggleSort('status')}
+              >
+                Status
+              </TableHeaderCell>
+              <TableHeaderCell
+                sortable
+                sortDirection={sort?.column === 'created_at' ? sort.direction : null}
+                onSort={() => toggleSort('created_at')}
+              >
+                Date
+              </TableHeaderCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
             {orders?.map((order) => (
-              <tr
+              <TableRow
                 key={order.id}
                 onClick={() => setSelectedId(order.id)}
-                className="cursor-pointer border-b border-border last:border-0 hover:bg-surface-2"
+                className="cursor-pointer hover:bg-surface-2"
               >
-                <td className="px-4 py-2.5">{order.customer_msisdn}</td>
-                <td className="px-4 py-2.5 tabular-nums">{formatKES(order.amount)}</td>
-                <td className="px-4 py-2.5">
+                <TableCell>{order.customer_msisdn}</TableCell>
+                <TableCell className="tabular-nums">{formatKES(order.amount)}</TableCell>
+                <TableCell>
                   <StatusBadge status={order.status} />
-                </td>
-                <td className="px-4 py-2.5 text-text-muted">{new Date(order.created_at).toLocaleDateString()}</td>
-              </tr>
+                </TableCell>
+                <TableCell className="text-text-muted">{new Date(order.created_at).toLocaleDateString()}</TableCell>
+              </TableRow>
             ))}
             {!isPending && orders?.length === 0 && (
               <tr>
@@ -65,8 +107,11 @@ export function Orders() {
                 </td>
               </tr>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
+        {ordersPage && (
+          <Pagination currentPage={ordersPage.current_page} lastPage={ordersPage.last_page} onPageChange={setPage} />
+        )}
       </Card>
 
       <OrderDetailPanel orderId={selectedId} onClose={() => setSelectedId(null)} />

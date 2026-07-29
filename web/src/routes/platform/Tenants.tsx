@@ -3,14 +3,35 @@ import { usePlatformTenants } from '../../api/platform'
 import { StatusBadge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
+import { Pagination } from '../../components/ui/Pagination'
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '../../components/ui/Table'
 import { formatKES } from '../../lib/formatKES'
 import { TenantDetailPanel } from './TenantDetailPanel'
 import { TenantFormPanel } from './TenantFormPanel'
 
+type SortColumn = 'name' | 'orders_count'
+type SortState = { column: SortColumn; direction: 'asc' | 'desc' } | null
+
 export function Tenants() {
-  const { data: tenants, isPending } = usePlatformTenants()
+  const [page, setPage] = useState(1)
+  const [sort, setSort] = useState<SortState>(null)
+  const { data: tenantsPage, isPending } = usePlatformTenants({
+    page,
+    sort: sort?.column,
+    direction: sort?.direction,
+  })
+  const tenants = tenantsPage?.data
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [formOpen, setFormOpen] = useState(false)
+
+  function toggleSort(column: SortColumn) {
+    setPage(1)
+    setSort((current) => {
+      if (current?.column !== column) return { column, direction: 'asc' }
+      if (current.direction === 'asc') return { column, direction: 'desc' }
+      return null
+    })
+  }
 
   return (
     <div>
@@ -22,34 +43,46 @@ export function Tenants() {
       </div>
 
       <Card className="overflow-hidden p-0">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border text-left text-text-subtle">
-              <th className="px-4 py-2 font-medium">Business</th>
-              <th className="px-4 py-2 font-medium">Status</th>
-              <th className="px-4 py-2 font-medium">Orders</th>
-              <th className="px-4 py-2 font-medium">Net remitted</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableHeaderCell
+                sortable
+                sortDirection={sort?.column === 'name' ? sort.direction : null}
+                onSort={() => toggleSort('name')}
+              >
+                Business
+              </TableHeaderCell>
+              <TableHeaderCell>Status</TableHeaderCell>
+              <TableHeaderCell
+                sortable
+                sortDirection={sort?.column === 'orders_count' ? sort.direction : null}
+                onSort={() => toggleSort('orders_count')}
+              >
+                Orders
+              </TableHeaderCell>
+              <TableHeaderCell>Net remitted</TableHeaderCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
             {tenants?.map((tenant) => (
-              <tr
+              <TableRow
                 key={tenant.id}
                 onClick={() => setSelectedId(tenant.id)}
-                className="cursor-pointer border-b border-border last:border-0 hover:bg-surface-2"
+                className="cursor-pointer hover:bg-surface-2"
               >
-                <td className="px-4 py-2.5">
+                <TableCell>
                   <p>{tenant.name}</p>
                   <p className="text-xs text-text-subtle">{tenant.slug}</p>
-                </td>
-                <td className="px-4 py-2.5">
+                </TableCell>
+                <TableCell>
                   <StatusBadge status={tenant.status} />
-                </td>
-                <td className="px-4 py-2.5 tabular-nums">{tenant.orders_count}</td>
-                <td className="px-4 py-2.5 tabular-nums">
+                </TableCell>
+                <TableCell className="tabular-nums">{tenant.orders_count}</TableCell>
+                <TableCell className="tabular-nums">
                   {tenant.net_remitted ? formatKES(tenant.net_remitted) : '—'}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
             {!isPending && tenants?.length === 0 && (
               <tr>
@@ -58,8 +91,11 @@ export function Tenants() {
                 </td>
               </tr>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
+        {tenantsPage && (
+          <Pagination currentPage={tenantsPage.current_page} lastPage={tenantsPage.last_page} onPageChange={setPage} />
+        )}
       </Card>
 
       <TenantDetailPanel tenantId={selectedId} onClose={() => setSelectedId(null)} />

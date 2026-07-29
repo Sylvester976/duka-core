@@ -3,6 +3,16 @@ import { apiClient } from './client'
 
 interface Paginated<T> {
   data: T[]
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
+}
+
+interface PageParams {
+  page?: number
+  sort?: string
+  direction?: 'asc' | 'desc'
 }
 
 export interface PlatformOverview {
@@ -35,12 +45,12 @@ export interface PlatformTenant {
   created_at: string
 }
 
-export function usePlatformTenants() {
+export function usePlatformTenants(params: PageParams = {}) {
   return useQuery({
-    queryKey: ['platform', 'tenants'],
+    queryKey: ['platform', 'tenants', params],
     queryFn: async () => {
-      const { data } = await apiClient.get<Paginated<PlatformTenant>>('/platform/tenants')
-      return data.data
+      const { data } = await apiClient.get<Paginated<PlatformTenant>>('/platform/tenants', { params })
+      return data
     },
   })
 }
