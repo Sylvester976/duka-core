@@ -148,6 +148,9 @@ export interface Overview {
   orders_today: number
   pending_payouts: number
   net_today: string
+  today_revenue_change_pct: number | null
+  orders_today_change_pct: number | null
+  net_today_change_pct: number | null
 }
 
 export function useOverview() {

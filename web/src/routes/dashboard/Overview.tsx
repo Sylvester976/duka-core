@@ -5,6 +5,12 @@ import { Card } from '../../components/ui/Card'
 import { StatCard } from '../../components/ui/StatCard'
 import { formatKES } from '../../lib/formatKES'
 
+function toDelta(pct: number | null | undefined) {
+  if (pct === null || pct === undefined) return undefined
+  const direction = pct > 0 ? ('up' as const) : pct < 0 ? ('down' as const) : ('flat' as const)
+  return { value: `${pct > 0 ? '+' : ''}${pct}% vs yesterday`, direction }
+}
+
 export function Overview() {
   const { data: overview, isPending } = useOverview()
   const { data: ordersPage } = useDashboardOrders()
@@ -19,12 +25,14 @@ export function Overview() {
           label="Today's revenue"
           value={overview ? formatKES(overview.today_revenue) : '—'}
           icon={Banknote}
+          delta={toDelta(overview?.today_revenue_change_pct)}
           loading={isPending}
         />
         <StatCard
           label="Orders today"
           value={overview ? String(overview.orders_today) : '—'}
           icon={ShoppingCart}
+          delta={toDelta(overview?.orders_today_change_pct)}
           loading={isPending}
         />
         <StatCard
@@ -37,6 +45,7 @@ export function Overview() {
           label="Net after fee"
           value={overview ? formatKES(overview.net_today) : '—'}
           icon={TrendingUp}
+          delta={toDelta(overview?.net_today_change_pct)}
           loading={isPending}
         />
       </div>
