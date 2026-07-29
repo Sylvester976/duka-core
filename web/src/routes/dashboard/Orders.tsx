@@ -11,7 +11,8 @@ const STATUS_FILTERS = ['all', 'pending', 'paid', 'failed', 'expired'] as const
 
 export function Orders() {
   const [filter, setFilter] = useState<(typeof STATUS_FILTERS)[number]>('all')
-  const { data: orders, isPending } = useDashboardOrders(filter === 'all' ? undefined : filter)
+  const { data: ordersPage, isPending } = useDashboardOrders(filter === 'all' ? {} : { status: filter })
+  const orders = ordersPage?.data
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
   return (

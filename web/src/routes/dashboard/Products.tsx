@@ -2,18 +2,39 @@ import { useState } from 'react'
 import { useDashboardProducts, useDeleteProduct, useUpdateProduct, type Product } from '../../api/dashboard'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
+import { Pagination } from '../../components/ui/Pagination'
 import { Switch } from '../../components/ui/Switch'
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '../../components/ui/Table'
 import { formatKES } from '../../lib/formatKES'
 import { ProductFormPanel } from './ProductFormPanel'
 
+type SortColumn = 'name' | 'price'
+type SortState = { column: SortColumn; direction: 'asc' | 'desc' } | null
+
 export function Products() {
-  const { data: products, isPending } = useDashboardProducts()
+  const [page, setPage] = useState(1)
+  const [sort, setSort] = useState<SortState>(null)
+  const { data: productsPage, isPending } = useDashboardProducts({
+    page,
+    sort: sort?.column,
+    direction: sort?.direction,
+  })
+  const products = productsPage?.data
   const updateProduct = useUpdateProduct()
   const deleteProduct = useDeleteProduct()
   const [panel, setPanel] = useState<{ open: boolean; product: Product | null }>({
     open: false,
     product: null,
   })
+
+  function toggleSort(column: SortColumn) {
+    setPage(1)
+    setSort((current) => {
+      if (current?.column !== column) return { column, direction: 'asc' }
+      if (current.direction === 'asc') return { column, direction: 'desc' }
+      return null
+    })
+  }
 
   return (
     <div>
@@ -25,28 +46,40 @@ export function Products() {
       </div>
 
       <Card className="overflow-hidden p-0">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border text-left text-text-subtle">
-              <th className="px-4 py-2 font-medium">Name</th>
-              <th className="px-4 py-2 font-medium">Price</th>
-              <th className="px-4 py-2 font-medium">Active</th>
-              <th className="px-4 py-2 font-medium" />
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableHeaderCell
+                sortable
+                sortDirection={sort?.column === 'name' ? sort.direction : null}
+                onSort={() => toggleSort('name')}
+              >
+                Name
+              </TableHeaderCell>
+              <TableHeaderCell
+                sortable
+                sortDirection={sort?.column === 'price' ? sort.direction : null}
+                onSort={() => toggleSort('price')}
+              >
+                Price
+              </TableHeaderCell>
+              <TableHeaderCell>Active</TableHeaderCell>
+              <TableHeaderCell />
+            </TableRow>
+          </TableHead>
+          <TableBody>
             {products?.map((product) => (
-              <tr key={product.id} className="border-b border-border last:border-0">
-                <td className="px-4 py-2.5">{product.name}</td>
-                <td className="px-4 py-2.5 tabular-nums">{formatKES(product.price)}</td>
-                <td className="px-4 py-2.5">
+              <TableRow key={product.id}>
+                <TableCell>{product.name}</TableCell>
+                <TableCell className="tabular-nums">{formatKES(product.price)}</TableCell>
+                <TableCell>
                   <Switch
                     checked={product.is_active}
                     onChange={(checked) => updateProduct.mutate({ id: product.id, is_active: checked })}
                     aria-label={`Toggle ${product.name} active`}
                   />
-                </td>
-                <td className="px-4 py-2.5 text-right">
+                </TableCell>
+                <TableCell className="text-right">
                   <button
                     type="button"
                     onClick={() => setPanel({ open: true, product })}
@@ -65,8 +98,8 @@ export function Products() {
                   >
                     Delete
                   </button>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
             {!isPending && products?.length === 0 && (
               <tr>
@@ -75,8 +108,11 @@ export function Products() {
                 </td>
               </tr>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
+        {productsPage && (
+          <Pagination currentPage={productsPage.current_page} lastPage={productsPage.last_page} onPageChange={setPage} />
+        )}
       </Card>
 
       <ProductFormPanel

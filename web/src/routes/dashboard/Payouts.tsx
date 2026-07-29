@@ -4,7 +4,8 @@ import { Card } from '../../components/ui/Card'
 import { formatKES } from '../../lib/formatKES'
 
 export function Payouts() {
-  const { data: payouts, isPending } = useDashboardPayouts()
+  const { data: payoutsPage, isPending } = useDashboardPayouts()
+  const payouts = payoutsPage?.data
 
   return (
     <div>

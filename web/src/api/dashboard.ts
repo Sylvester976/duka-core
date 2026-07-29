@@ -3,6 +3,19 @@ import { apiClient } from './client'
 
 interface Paginated<T> {
   data: T[]
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
+}
+
+interface SortParams {
+  sort?: string
+  direction?: 'asc' | 'desc'
+}
+
+interface PageParams extends SortParams {
+  page?: number
 }
 
 export interface Product {
@@ -14,12 +27,12 @@ export interface Product {
   is_active: boolean
 }
 
-export function useDashboardProducts() {
+export function useDashboardProducts(params: PageParams = {}) {
   return useQuery({
-    queryKey: ['dashboard', 'products'],
+    queryKey: ['dashboard', 'products', params],
     queryFn: async () => {
-      const { data } = await apiClient.get<Paginated<Product>>('/dashboard/products')
-      return data.data
+      const { data } = await apiClient.get<Paginated<Product>>('/dashboard/products', { params })
+      return data
     },
   })
 }
@@ -95,14 +108,16 @@ export interface DashboardOrder {
   payout?: DashboardPayout | null
 }
 
-export function useDashboardOrders(status?: string) {
+interface OrdersParams extends PageParams {
+  status?: string
+}
+
+export function useDashboardOrders(params: OrdersParams = {}) {
   return useQuery({
-    queryKey: ['dashboard', 'orders', status],
+    queryKey: ['dashboard', 'orders', params],
     queryFn: async () => {
-      const { data } = await apiClient.get<Paginated<DashboardOrder>>('/dashboard/orders', {
-        params: status ? { status } : undefined,
-      })
-      return data.data
+      const { data } = await apiClient.get<Paginated<DashboardOrder>>('/dashboard/orders', { params })
+      return data
     },
   })
 }
@@ -118,12 +133,12 @@ export function useDashboardOrder(id: string) {
   })
 }
 
-export function useDashboardPayouts() {
+export function useDashboardPayouts(params: PageParams = {}) {
   return useQuery({
-    queryKey: ['dashboard', 'payouts'],
+    queryKey: ['dashboard', 'payouts', params],
     queryFn: async () => {
-      const { data } = await apiClient.get<Paginated<DashboardPayout>>('/dashboard/payouts')
-      return data.data
+      const { data } = await apiClient.get<Paginated<DashboardPayout>>('/dashboard/payouts', { params })
+      return data
     },
   })
 }

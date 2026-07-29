@@ -7,7 +7,8 @@ import { formatKES } from '../../lib/formatKES'
 
 export function Overview() {
   const { data: overview, isPending } = useOverview()
-  const { data: orders } = useDashboardOrders()
+  const { data: ordersPage } = useDashboardOrders()
+  const orders = ordersPage?.data
 
   return (
     <div>
