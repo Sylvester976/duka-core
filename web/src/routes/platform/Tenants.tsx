@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { usePlatformTenants } from '../../api/platform'
+import { usePlatformTenants, useUpdateTenantStatus } from '../../api/platform'
 import { StatusBadge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
+import { Checkbox } from '../../components/ui/Checkbox'
 import { Pagination } from '../../components/ui/Pagination'
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '../../components/ui/Table'
 import { formatKES } from '../../lib/formatKES'
@@ -15,16 +16,24 @@ type SortState = { column: SortColumn; direction: 'asc' | 'desc' } | null
 export function Tenants() {
   const [page, setPage] = useState(1)
   const [sort, setSort] = useState<SortState>(null)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
   const { data: tenantsPage, isPending } = usePlatformTenants({
     page,
     sort: sort?.column,
     direction: sort?.direction,
   })
   const tenants = tenantsPage?.data
+  const updateTenantStatus = useUpdateTenantStatus()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [formOpen, setFormOpen] = useState(false)
 
+  function goToPage(next: number) {
+    setSelected(new Set())
+    setPage(next)
+  }
+
   function toggleSort(column: SortColumn) {
+    setSelected(new Set())
     setPage(1)
     setSort((current) => {
       if (current?.column !== column) return { column, direction: 'asc' }
@@ -32,6 +41,29 @@ export function Tenants() {
       return null
     })
   }
+
+  function toggleSelected(id: string) {
+    setSelected((current) => {
+      const next = new Set(current)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  function toggleSelectAll() {
+    setSelected((current) => {
+      if (tenants && current.size === tenants.length) return new Set()
+      return new Set(tenants?.map((tenant) => tenant.id))
+    })
+  }
+
+  async function bulkSetStatus(status: 'active' | 'suspended') {
+    await Promise.all([...selected].map((id) => updateTenantStatus.mutateAsync({ id, status })))
+    setSelected(new Set())
+  }
+
+  const allSelected = Boolean(tenants?.length) && selected.size === tenants?.length
 
   return (
     <div>
@@ -43,9 +75,33 @@ export function Tenants() {
       </div>
 
       <Card className="overflow-hidden p-0">
+        {selected.size > 0 && (
+          <div className="flex items-center gap-3 border-b border-border bg-surface-2 px-4 py-2 text-sm">
+            <span className="text-text-muted">{selected.size} selected</span>
+            <Button
+              type="button"
+              variant="ghost"
+              className="min-h-8 px-2 text-sm"
+              onClick={() => bulkSetStatus('suspended')}
+            >
+              Suspend selected
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="min-h-8 px-2 text-sm"
+              onClick={() => bulkSetStatus('active')}
+            >
+              Reactivate selected
+            </Button>
+          </div>
+        )}
         <Table>
           <TableHead>
             <TableRow>
+              <TableHeaderCell className="w-8">
+                <Checkbox checked={allSelected} onChange={toggleSelectAll} aria-label="Select all tenants" />
+              </TableHeaderCell>
               <TableHeaderCell
                 sortable
                 sortDirection={sort?.column === 'name' ? sort.direction : null}
@@ -71,6 +127,13 @@ export function Tenants() {
                 onClick={() => setSelectedId(tenant.id)}
                 className="cursor-pointer hover:bg-surface-2"
               >
+                <TableCell onClick={(event) => event.stopPropagation()}>
+                  <Checkbox
+                    checked={selected.has(tenant.id)}
+                    onChange={() => toggleSelected(tenant.id)}
+                    aria-label={`Select ${tenant.name}`}
+                  />
+                </TableCell>
                 <TableCell>
                   <p>{tenant.name}</p>
                   <p className="text-xs text-text-subtle">{tenant.slug}</p>
@@ -86,7 +149,7 @@ export function Tenants() {
             ))}
             {!isPending && tenants?.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-text-muted">
+                <td colSpan={5} className="px-4 py-8 text-center text-text-muted">
                   No tenants yet.
                 </td>
               </tr>
@@ -94,7 +157,7 @@ export function Tenants() {
           </TableBody>
         </Table>
         {tenantsPage && (
-          <Pagination currentPage={tenantsPage.current_page} lastPage={tenantsPage.last_page} onPageChange={setPage} />
+          <Pagination currentPage={tenantsPage.current_page} lastPage={tenantsPage.last_page} onPageChange={goToPage} />
         )}
       </Card>
 
