@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
 use App\Models\Product;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    private const SORTABLE = ['name', 'price', 'is_active'];
+
+    public function index(Request $request)
     {
-        return Product::query()->latest()->paginate();
+        return $this->applySort(Product::query(), $request, self::SORTABLE)->paginate();
     }
 
     public function store(ProductRequest $request)

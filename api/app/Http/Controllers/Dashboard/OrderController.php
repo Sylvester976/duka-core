@@ -10,15 +10,17 @@ class OrderController extends Controller
 {
     private const VALID_STATUSES = ['pending', 'paid', 'failed', 'expired'];
 
+    private const SORTABLE = ['amount', 'status', 'created_at'];
+
     public function index(Request $request)
     {
-        return Order::query()
+        $query = Order::query()
             ->when(
                 in_array($request->query('status'), self::VALID_STATUSES, true),
                 fn ($query) => $query->where('status', $request->query('status')),
-            )
-            ->latest()
-            ->paginate();
+            );
+
+        return $this->applySort($query, $request, self::SORTABLE)->paginate();
     }
 
     public function show(Order $order)

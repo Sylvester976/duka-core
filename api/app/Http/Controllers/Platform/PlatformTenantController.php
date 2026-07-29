@@ -8,17 +8,20 @@ use App\Http\Requests\UpdateTenantStatusRequest;
 use App\Models\Payout;
 use App\Models\Tenant;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PlatformTenantController extends Controller
 {
-    public function index()
+    private const SORTABLE = ['name', 'orders_count', 'created_at'];
+
+    public function index(Request $request)
     {
-        return Tenant::query()
+        $query = Tenant::query()
             ->withCount('orders')
-            ->withSum(['payouts as net_remitted' => fn ($query) => $query->where('status', 'paid')], 'net_amount')
-            ->latest()
-            ->paginate();
+            ->withSum(['payouts as net_remitted' => fn ($query) => $query->where('status', 'paid')], 'net_amount');
+
+        return $this->applySort($query, $request, self::SORTABLE)->paginate();
     }
 
     public function store(StoreTenantRequest $request)
