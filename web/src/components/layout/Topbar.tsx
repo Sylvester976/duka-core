@@ -1,7 +1,9 @@
+import { useEffect, useRef, useState } from 'react'
 import { Search } from 'lucide-react'
-import { useLocation } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import { Dropdown, DropdownItem } from '../ui/Dropdown'
-import { findActiveNavItem, type NavGroup } from './nav'
+import { Sheet } from '../ui/Sheet'
+import { findActiveNavItem, flattenNavGroups, type NavGroup } from './nav'
 
 interface TopbarProps {
   rootLabel: string
@@ -13,7 +15,39 @@ interface TopbarProps {
 
 export function Topbar({ rootLabel, groups, userName, userEmail, onLogout }: TopbarProps) {
   const location = useLocation()
+  const navigate = useNavigate()
   const activeItem = findActiveNavItem(location.pathname, groups)
+
+  const [paletteOpen, setPaletteOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+  const items = flattenNavGroups(groups)
+  const filteredItems = query
+    ? items.filter((item) => item.label.toLowerCase().includes(query.toLowerCase()))
+    : items
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        setPaletteOpen(true)
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  useEffect(() => {
+    if (!paletteOpen) return
+    setQuery('')
+    const id = setTimeout(() => inputRef.current?.focus(), 0)
+    return () => clearTimeout(id)
+  }, [paletteOpen])
+
+  function goTo(to: string) {
+    navigate(to)
+    setPaletteOpen(false)
+  }
 
   return (
     <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-surface px-8">
@@ -29,6 +63,7 @@ export function Topbar({ rootLabel, groups, userName, userEmail, onLogout }: Top
       <div className="flex items-center gap-3">
         <button
           type="button"
+          onClick={() => setPaletteOpen(true)}
           className="flex items-center gap-2 rounded-[var(--radius)] border border-border px-3 py-1.5 text-sm text-text-muted transition-colors hover:border-text-subtle"
         >
           <Search className="h-4 w-4" />
@@ -54,6 +89,34 @@ export function Topbar({ rootLabel, groups, userName, userEmail, onLogout }: Top
           </DropdownItem>
         </Dropdown>
       </div>
+
+      <Sheet open={paletteOpen} onClose={() => setPaletteOpen(false)} side="center" title="Jump to">
+        <input
+          ref={inputRef}
+          type="text"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') setPaletteOpen(false)
+          }}
+          placeholder="Search pages…"
+          className="mb-3 w-full rounded-[var(--radius)] border border-border bg-transparent px-3 py-2 text-sm outline-none transition-colors focus:border-brand"
+        />
+        <div className="flex flex-col gap-1">
+          {filteredItems.map((item) => (
+            <button
+              key={item.to}
+              type="button"
+              onClick={() => goTo(item.to)}
+              className="flex items-center gap-2 rounded-[var(--radius)] px-3 py-2 text-left text-sm text-text transition-colors hover:bg-surface-2"
+            >
+              <item.icon className="h-4 w-4 text-text-muted" />
+              {item.label}
+            </button>
+          ))}
+          {filteredItems.length === 0 && <p className="px-3 py-2 text-sm text-text-muted">No matches.</p>}
+        </div>
+      </Sheet>
     </header>
   )
 }
