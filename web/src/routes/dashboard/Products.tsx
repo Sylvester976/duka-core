@@ -3,6 +3,7 @@ import { useDashboardProducts, useDeleteProduct, useUpdateProduct, type Product 
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { Checkbox } from '../../components/ui/Checkbox'
+import { Dropdown, DropdownItem } from '../../components/ui/Dropdown'
 import { Pagination } from '../../components/ui/Pagination'
 import { Switch } from '../../components/ui/Switch'
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '../../components/ui/Table'
@@ -141,24 +142,19 @@ export function Products() {
                   />
                 </TableCell>
                 <TableCell className="text-right">
-                  <button
-                    type="button"
-                    onClick={() => setPanel({ open: true, product })}
-                    className="mr-3 text-text-muted hover:text-text"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (confirm(`Delete ${product.name}?`)) {
-                        deleteProduct.mutate(product.id)
-                      }
-                    }}
-                    className="text-danger hover:opacity-80"
-                  >
-                    Delete
-                  </button>
+                  <Dropdown>
+                    <DropdownItem onClick={() => setPanel({ open: true, product })}>Edit</DropdownItem>
+                    <DropdownItem
+                      variant="danger"
+                      onClick={() => {
+                        if (confirm(`Delete ${product.name}?`)) {
+                          deleteProduct.mutate(product.id)
+                        }
+                      }}
+                    >
+                      Delete
+                    </DropdownItem>
+                  </Dropdown>
                 </TableCell>
               </TableRow>
             ))}

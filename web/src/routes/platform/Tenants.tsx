@@ -4,6 +4,7 @@ import { StatusBadge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { Checkbox } from '../../components/ui/Checkbox'
+import { Dropdown, DropdownItem } from '../../components/ui/Dropdown'
 import { Pagination } from '../../components/ui/Pagination'
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '../../components/ui/Table'
 import { formatKES } from '../../lib/formatKES'
@@ -118,6 +119,7 @@ export function Tenants() {
                 Orders
               </TableHeaderCell>
               <TableHeaderCell>Net remitted</TableHeaderCell>
+              <TableHeaderCell />
             </TableRow>
           </TableHead>
           <TableBody>
@@ -145,11 +147,27 @@ export function Tenants() {
                 <TableCell className="tabular-nums">
                   {tenant.net_remitted ? formatKES(tenant.net_remitted) : '—'}
                 </TableCell>
+                <TableCell className="text-right" onClick={(event) => event.stopPropagation()}>
+                  <Dropdown>
+                    {tenant.status === 'active' ? (
+                      <DropdownItem
+                        variant="danger"
+                        onClick={() => updateTenantStatus.mutate({ id: tenant.id, status: 'suspended' })}
+                      >
+                        Suspend
+                      </DropdownItem>
+                    ) : (
+                      <DropdownItem onClick={() => updateTenantStatus.mutate({ id: tenant.id, status: 'active' })}>
+                        Reactivate
+                      </DropdownItem>
+                    )}
+                  </Dropdown>
+                </TableCell>
               </TableRow>
             ))}
             {!isPending && tenants?.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-text-muted">
+                <td colSpan={6} className="px-4 py-8 text-center text-text-muted">
                   No tenants yet.
                 </td>
               </tr>
