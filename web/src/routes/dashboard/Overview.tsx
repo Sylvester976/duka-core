@@ -1,7 +1,8 @@
+import { Banknote, Clock, ShoppingCart, TrendingUp } from 'lucide-react'
 import { useDashboardOrders, useOverview } from '../../api/dashboard'
 import { StatusBadge } from '../../components/ui/Badge'
 import { Card } from '../../components/ui/Card'
-import { cn } from '../../lib/cn'
+import { StatCard } from '../../components/ui/StatCard'
 import { formatKES } from '../../lib/formatKES'
 
 export function Overview() {
@@ -13,10 +14,30 @@ export function Overview() {
       <h1 className="mb-6 font-serif text-2xl">Overview</h1>
 
       <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Today's revenue" value={overview ? formatKES(overview.today_revenue) : '—'} loading={isPending} />
-        <StatCard label="Orders today" value={overview ? String(overview.orders_today) : '—'} loading={isPending} />
-        <StatCard label="Pending payouts" value={overview ? String(overview.pending_payouts) : '—'} loading={isPending} />
-        <StatCard label="Net after fee" value={overview ? formatKES(overview.net_today) : '—'} loading={isPending} />
+        <StatCard
+          label="Today's revenue"
+          value={overview ? formatKES(overview.today_revenue) : '—'}
+          icon={Banknote}
+          loading={isPending}
+        />
+        <StatCard
+          label="Orders today"
+          value={overview ? String(overview.orders_today) : '—'}
+          icon={ShoppingCart}
+          loading={isPending}
+        />
+        <StatCard
+          label="Pending payouts"
+          value={overview ? String(overview.pending_payouts) : '—'}
+          icon={Clock}
+          loading={isPending}
+        />
+        <StatCard
+          label="Net after fee"
+          value={overview ? formatKES(overview.net_today) : '—'}
+          icon={TrendingUp}
+          loading={isPending}
+        />
       </div>
 
       <h2 className="mb-3 text-sm font-semibold text-text-muted">Recent orders</h2>
@@ -50,16 +71,5 @@ export function Overview() {
         </table>
       </Card>
     </div>
-  )
-}
-
-function StatCard({ label, value, loading }: { label: string; value: string; loading: boolean }) {
-  return (
-    <Card>
-      <p className="text-xs text-text-muted">{label}</p>
-      <p className={cn('mt-1 text-2xl font-semibold tabular-nums', loading && 'animate-pulse text-text-subtle')}>
-        {value}
-      </p>
-    </Card>
   )
 }
