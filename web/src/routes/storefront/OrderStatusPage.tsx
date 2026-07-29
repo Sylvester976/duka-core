@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { Check, X } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router'
 import { useOrderStatus, useStorefront } from '../../api/storefront'
 import { Button } from '../../components/ui/Button'
@@ -34,17 +35,7 @@ export function OrderStatusPage() {
       ) : order.status === 'paid' ? (
         <>
           <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-success">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-8 w-8 text-bg"
-            >
-              <path d="M20 6 9 17l-5-5" />
-            </svg>
+            <Check className="h-8 w-8 text-bg" strokeWidth={3} />
           </div>
           <h1 className="mb-2 font-serif text-2xl">Payment received</h1>
           <p className="mb-1 text-text-muted">Thank you!</p>
@@ -54,17 +45,7 @@ export function OrderStatusPage() {
       ) : (
         <>
           <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-surface-2">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-8 w-8 text-text-subtle"
-            >
-              <path d="M18 6 6 18M6 6l12 12" />
-            </svg>
+            <X className="h-8 w-8 text-text-subtle" strokeWidth={3} />
           </div>
           <h1 className="mb-2 font-serif text-2xl">
             {order.status === 'expired' ? 'Payment expired' : 'Payment failed'}

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Lock } from 'lucide-react'
 import { useNavigate } from 'react-router'
 import { useCheckout } from '../../api/storefront'
 import { Button } from '../../components/ui/Button'
@@ -75,7 +76,14 @@ export function CheckoutModal({ slug, open, onClose }: CheckoutModalProps) {
       />
 
       <Button type="button" className="mt-3 w-full" loading={checkout.isPending} onClick={handlePay}>
-        {checkout.isPending ? 'Sending request to your phone…' : `Pay ${formatKES(subtotal)} with M-Pesa`}
+        {checkout.isPending ? (
+          'Sending request to your phone…'
+        ) : (
+          <>
+            <Lock className="h-4 w-4" />
+            {`Pay ${formatKES(subtotal)} with M-Pesa`}
+          </>
+        )}
       </Button>
 
       {!checkout.isPending && (
