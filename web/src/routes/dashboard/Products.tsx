@@ -77,7 +77,7 @@ export function Products() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="font-serif text-2xl">Products</h1>
+        <h1 className="font-semibold text-2xl">Products</h1>
         <Button type="button" onClick={() => setPanel({ open: true, product: null })}>
           Add product
         </Button>

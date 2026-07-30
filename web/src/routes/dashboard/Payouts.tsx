@@ -30,7 +30,7 @@ export function Payouts() {
 
   return (
     <div>
-      <h1 className="mb-6 font-serif text-2xl">Payouts</h1>
+      <h1 className="mb-6 font-semibold text-2xl">Payouts</h1>
 
       <Card className="overflow-hidden p-0">
         <Table>

@@ -7,7 +7,7 @@ import type { NavGroup } from './nav'
 export function Sidebar({ groups }: { groups: NavGroup[] }) {
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r border-border bg-surface p-6">
-      <p className="mb-8 font-serif text-lg">duka-core</p>
+      <p className="mb-8 font-semibold text-lg">duka-core</p>
       <nav className="flex flex-1 flex-col gap-5">
         {groups.map((group, index) => (
           <NavGroupSection key={group.label ?? index} group={group} />

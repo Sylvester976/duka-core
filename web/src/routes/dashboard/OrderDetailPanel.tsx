@@ -20,7 +20,7 @@ export function OrderDetailPanel({ orderId, onClose }: { orderId: string | null;
       ) : (
         <>
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-serif text-lg">Order</h2>
+            <h2 className="font-semibold text-lg">Order</h2>
             <StatusBadge status={order.status} />
           </div>
 

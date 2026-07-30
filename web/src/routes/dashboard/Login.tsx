@@ -33,8 +33,8 @@ export function Login() {
         onSubmit={handleSubmit}
         className="w-full max-w-sm rounded-[var(--radius)] border border-border bg-surface p-8"
       >
-        <p className="mb-6 font-serif text-lg">duka-core</p>
-        <h1 className="mb-1 font-serif text-xl">Sign in</h1>
+        <p className="mb-6 font-semibold text-lg">duka-core</p>
+        <h1 className="mb-1 font-semibold text-xl">Sign in</h1>
         <p className="mb-6 text-sm text-text-muted">Business dashboard</p>
 
         <Input

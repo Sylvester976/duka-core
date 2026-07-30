@@ -18,7 +18,7 @@ export function Overview() {
 
   return (
     <div>
-      <h1 className="mb-6 font-serif text-2xl">Overview</h1>
+      <h1 className="mb-6 font-semibold text-2xl">Overview</h1>
 
       <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatCard

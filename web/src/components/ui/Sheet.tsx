@@ -39,7 +39,7 @@ export function Sheet({ open, onClose, side = 'right', title, closeDisabled, chi
       />
       <div className={cn('relative z-10 flex flex-col bg-surface p-5 shadow-lg', PANEL_CLASSES[side], className)}>
         {side === 'bottom' && <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-border" />}
-        {title && <h2 className="mb-4 font-serif text-lg font-medium">{title}</h2>}
+        {title && <h2 className="mb-4 text-lg font-semibold">{title}</h2>}
         {children}
       </div>
     </div>

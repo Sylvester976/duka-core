@@ -2,14 +2,15 @@
 
 > **Design brief for Claude Code.** Adopt this persona while building every screen:
 >
-> *You are the most ruthless, conversion-obsessed startup founder and UI/UX designer alive. You've scaled 3 SaaS products past $10M ARR. You've studied every pixel of Linear, Superhuman, Vercel, Raycast, and Arc. You can spot a vibe-coded AI project from 50 feet away. Your only goal: make every single visitor start a free trial.*
+> *You are the most ruthless, conversion-obsessed startup founder and UI/UX designer alive. You've scaled 3 SaaS products past $10M ARR. You've studied every pixel of Stripe, Linear, Vercel, and Raycast — Stripe above all: clean whites, soft gradients, geometric rounded accents, effortless trust. You can spot a vibe-coded AI project from 50 feet away. Your only goal: make every single visitor start a free trial.*
 >
-> Every pixel earns its place or gets cut. No default Bootstrap look. No purple gradients. No emoji-as-design. If it looks like a template, it's wrong.
+> Every pixel earns its place or gets cut. No default Bootstrap look. No emoji-as-design. If it looks like a template, it's wrong.
 
-There are **two distinct surfaces** with different jobs. Do not blur them.
+There are **three distinct surfaces** with different jobs. Do not blur them.
 
-1. **The storefront** (public, customer-facing) — job: get a stranger from landing to *M-Pesa confirmed* in the fewest taps. Mobile-first, thumb-reachable, trust-signalling.
-2. **The dashboard** (private, business-owner-facing) — job: dense, fast, keyboard-friendly control panel. Aesop-grade restraint.
+1. **The public marketing site** (`/`) — job: convert a cold visitor into a signup. Stripe-grade polish: hero, clear product story, the 2-plan pricing section.
+2. **The storefront** (public, customer-facing per tenant) — job: get a stranger from landing to *M-Pesa confirmed* in the fewest taps. Mobile-first, thumb-reachable, trust-signalling.
+3. **The dashboard / platform admin** (private, business-owner-facing) — job: dense, fast, keyboard-friendly control panel. Stripe-grade clarity.
 
 ---
 
@@ -27,29 +28,29 @@ There are **two distinct surfaces** with different jobs. Do not blur them.
 ## 2. Visual language
 
 ### Color
-A warm, near-monochrome apothecary palette on a single cream base — no separate dark dashboard. The accent on the **storefront** is the tenant's brand color (dynamic, chosen in Settings). The accent on the **dashboard/platform admin** is a fixed ink charcoal — the same neutral used for body text — so an arbitrary tenant hex never has to carry an entire dense admin UI.
+A clean, Stripe-inspired palette: cool-white/light-blue backgrounds, plenty of negative space, one confident indigo accent. The accent on the **storefront** is the tenant's brand color (dynamic, chosen in Settings). The accent on the **dashboard/platform admin/marketing site** is a fixed indigo — so an arbitrary tenant hex never has to carry an entire dense admin UI.
 
 ```
-/* Unified tokens (dashboard, platform admin, storefront chrome) */
---bg:            #F7F4EE
+/* Unified tokens (dashboard, platform admin, marketing site, storefront chrome) */
+--bg:            #F6F9FC
 --surface:       #FFFFFF
---surface-2:     #EEE9DF
---border:        #DEDACC
---text:          #2A2722
---text-muted:    #6B6559
---text-subtle:   #9C9686
---brand:         #2A2722   /* fixed ink accent, == --text */
---brand-hover:   #45413A
---brand-contrast: #F7F4EE  /* == --bg */
---danger:        #B3402B
---warning:       #A6752B
---success:       #4B6B4E
---radius:        2px       /* buttons, cards, inputs, badges */
---radius-lg:     4px       /* modals, sheets, slide-overs */
+--surface-2:     #F3F6FA
+--border:        #E3E8EE
+--text:          #0A2540
+--text-muted:    #425466
+--text-subtle:   #8792A2
+--brand:         #635BFF   /* fixed indigo accent */
+--brand-hover:   #514AE0
+--brand-contrast: #FFFFFF
+--danger:        #DF1B41
+--warning:       #FF9E2C
+--success:       #24B47E
+--radius:        8px       /* buttons, cards, inputs */
+--radius-lg:     16px      /* modals, sheets, slide-overs */
 ```
 
 ```
-/* Storefront only — brand is injected per-tenant at runtime, overriding the ink default */
+/* Storefront only — brand is injected per-tenant at runtime, overriding the indigo default */
 :root {
   --brand: <tenant.brand_primary>;   /* set via JS on load */
   --brand-contrast: <computed>;      /* white or near-black for legibility on brand */
@@ -65,14 +66,13 @@ Tailwind reads these via `@theme inline` in `web/src/index.css` (Tailwind v4, no
 }
 ```
 
-**Rules:** exactly one accent in view at a time. On the dashboard/platform it's always ink — never the tenant color. On the storefront it's the tenant's brand color, reserved for the primary CTA and success states — never for decoration. Backgrounds stay warm and neutral; danger/warning/success are muted earth tones, never saturated stock colors.
+**Rules:** exactly one accent in view at a time. On the dashboard/platform/marketing site it's always indigo — never the tenant color. On the storefront it's the tenant's brand color, reserved for the primary CTA and success states — never for decoration. Backgrounds stay cool and light (a soft vertical gradient on `body`, not a flat fill); danger/warning/success stay clear and legible, never muddy.
 
 ### Typography
-- **Headings:** `Fraunces` (variable, weights 400/500, non-italic) — a literary serif for every real page/panel title.
-- **UI/body:** `Public Sans` (weights 400/500/600). Tight, legible at small sizes on cheap Android screens.
+- **Everything:** `Inter` (weights 400/500/600/700) — one geometric sans family, no serif. Hierarchy comes from weight and size, not a font pairing.
 - **Scale (dashboard):** 12 / 13 / 14 (base) / 16 / 20 / 24 / 32. Body is 14, not 16 — density matters.
-- **Storefront** runs slightly larger (16 base) because it's touch, one-handed, and often in sunlight.
-- **Weights:** 400 body, 500 UI labels, 500 headings (serif reads as emphasis on its own — avoid 600+ except a single hero number, the price).
+- **Storefront/marketing** runs slightly larger (16 base) because it's touch, one-handed, and often in sunlight.
+- **Weights:** 400 body, 500 UI labels, 600-700 headings (real weight contrast does the emphasis work a serif used to).
 - **Numbers:** tabular figures for all money (`font-variant-numeric: tabular-nums`) so amounts don't jitter.
 - **Money format:** always `KES 1,499.00` — currency prefix, thousands separators, 2 decimals, tabular.
 
@@ -82,9 +82,8 @@ Tailwind reads these via `@theme inline` in `web/src/index.css` (Tailwind v4, no
 - Max content width on dashboard tables ~1200px; storefront checkout column ~440px (one-thumb).
 
 ### Depth
-- Flat. Depth comes from **1px hairline borders and the `--bg`/`--surface` tone shift**, not heavy shadows.
-- One soft, low-opacity shadow allowed on elevated things (modals, the checkout sheet, slide-over panels) — barely visible, never heavy.
-- Radius **2px** on cards/buttons/inputs/badges, **4px** on modals/sheets/slide-overs — sharp, not rounded. Consistent.
+- Soft and geometric. Cards, buttons, and elevated surfaces get a **subtle, low-opacity shadow** (`--shadow-sm`) plus a hairline border — depth is gentle, never heavy or skeuomorphic.
+- Radius **8px** on cards/buttons/inputs, **16px** on modals/sheets/slide-overs — rounded, confident, consistent. Fully rounded (`rounded-full`) on pills/badges/switches.
 
 ### Motion
 - Fast and functional: 120–180ms ease-out for most, spring for the cart/checkout sheet.
@@ -96,21 +95,21 @@ Tailwind reads these via `@theme inline` in `web/src/index.css` (Tailwind v4, no
 ## 3. Component standards
 
 **Buttons**
-- Primary: solid `--brand` fill, `--brand-contrast` text, 500 weight (quieter than a stock 600), sharp `--radius`, full-width on mobile CTAs. One per screen.
-- Secondary: 1px `--border`, transparent, `--text` label — text-forward, not a filled pill.
+- Primary: solid `--brand` fill, `--brand-contrast` text, 600 weight, `--radius`, subtle `--shadow-sm` lift, full-width on mobile CTAs. One per screen.
+- Secondary: 1px `--border`, transparent, `--text` label.
 - Ghost/tertiary: text only, for low-priority actions.
 - Loading state: label swaps to a spinner + verb ("Sending STK Push…"), button stays same size (no layout shift), stays disabled.
 - Min tap target 44px on storefront.
 
 **Inputs**
-- Shared `Input` component (`web/src/components/ui/Input.tsx`): label above field, 1px `--border`, sharp `--radius`, focus switches border to `--brand` — hairline only, no glow/ring.
+- Shared `Input` component (`web/src/components/ui/Input.tsx`): label above field, 1px `--border`, `--radius`, focus switches border to `--brand` — hairline only, no glow/ring.
 - Phone input for MSISDN: format/mask to `07XX XXX XXX`, validate to Safaricom format, show the error inline the moment it's wrong — not on submit.
 
-**Cards** — flat `--surface` on `--bg`, 1px `--border`, sharp `--radius`; hover raises border to `--text-subtle` (dashboard) or lifts with the one allowed soft shadow (storefront product).
+**Cards** — `--surface` on `--bg`, 1px `--border`, `--radius`, subtle `--shadow-sm`; hover raises the shadow slightly (dashboard) or lifts further (storefront product).
 
 **Tables (dashboard)** — dense rows (40–44px), tabular numbers, sticky header, row hover, right-aligned money columns, status as a `Badge`.
 
-**Badges (status)** — text-forward bordered tags (`border-current/25`, sharp `--radius`, uppercase tracked label), no filled background. Shared status vocabulary, same everywhere:
+**Badges (status)** — soft-filled tinted pills (`rounded-full`, ~10% tint background of the status color, same color text, uppercase tracked label). Shared status vocabulary, same everywhere:
 | State | Color | Label |
 |---|---|---|
 | pending / processing | `--warning` ochre | "Pending" / "Processing" |
@@ -156,7 +155,7 @@ This is where the money is won or lost. Optimize ruthlessly.
 
 ## 5. The dashboard (control panel)
 
-Aesop-grade restraint. Fast, dense, keyboard-aware.
+Stripe-grade clarity. Fast, dense, keyboard-aware.
 
 - **Shell:** slim left sidebar (Overview, Products, Orders, Payouts, Settings), tenant name + logo at top, minimal.
 - **Overview:** a tight row of stat cards (Today's revenue, Orders, Pending payouts, Net after platform fee), then a recent-orders table. Numbers are the hero. Tabular, calm.
@@ -174,7 +173,7 @@ Aesop-grade restraint. Fast, dense, keyboard-aware.
 
 ## 6. Anti-patterns (auto-reject in review)
 
-- Purple/blue SaaS gradient heroes.
+- Gradient heroes with no restraint — a soft, subtle gradient is the house style now (Stripe-grade), but it must stay quiet: no loud rainbow meshes, no gradient text, no gradient on more than one hero surface per screen.
 - Emoji used as iconography in the UI (fine in docs, never in product chrome).
 - Dead spinners with no context during the M-Pesa wait.
 - Bootstrap default components left unstyled.

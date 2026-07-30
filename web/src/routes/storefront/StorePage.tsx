@@ -48,7 +48,7 @@ function StorePageContent() {
           </div>
         )}
         <div>
-          <p className="font-serif text-[17px] leading-tight">{tenant.name}</p>
+          <p className="font-semibold text-[17px] leading-tight">{tenant.name}</p>
           <p className="text-xs text-text-muted">Pay securely with M-Pesa</p>
         </div>
       </header>

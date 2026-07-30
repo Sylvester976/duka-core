@@ -10,7 +10,7 @@ export function Settings() {
   const updateSettings = useUpdateTenantSettings()
 
   const [name, setName] = useState('')
-  const [brandPrimary, setBrandPrimary] = useState('#2A2722')
+  const [brandPrimary, setBrandPrimary] = useState('#635BFF')
   const [mpesaB2cMsisdn, setMpesaB2cMsisdn] = useState('')
   const [saved, setSaved] = useState(false)
 
@@ -36,7 +36,7 @@ export function Settings() {
 
   return (
     <div className="max-w-lg">
-      <h1 className="mb-6 font-serif text-2xl">Settings</h1>
+      <h1 className="mb-6 font-semibold text-2xl">Settings</h1>
 
       <Card>
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-text-muted">Business profile</h2>

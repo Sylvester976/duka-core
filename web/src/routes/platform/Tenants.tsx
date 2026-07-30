@@ -69,7 +69,7 @@ export function Tenants() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="font-serif text-2xl">Tenants</h1>
+        <h1 className="font-semibold text-2xl">Tenants</h1>
         <Button type="button" onClick={() => setFormOpen(true)}>
           New tenant
         </Button>

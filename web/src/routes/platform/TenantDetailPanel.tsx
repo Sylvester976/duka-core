@@ -15,7 +15,7 @@ export function TenantDetailPanel({ tenantId, onClose }: { tenantId: string | nu
       ) : (
         <>
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-serif text-lg">{data.tenant.name}</h2>
+            <h2 className="font-semibold text-lg">{data.tenant.name}</h2>
             <StatusBadge status={data.tenant.status} />
           </div>
 

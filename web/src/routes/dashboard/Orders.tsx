@@ -38,7 +38,7 @@ export function Orders() {
 
   return (
     <div>
-      <h1 className="mb-4 font-serif text-2xl">Orders</h1>
+      <h1 className="mb-4 font-semibold text-2xl">Orders</h1>
 
       <div className="mb-4 flex gap-2">
         {STATUS_FILTERS.map((status) => (
