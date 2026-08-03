@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
+import { BrowserRouter, Route, Routes } from 'react-router'
 import { AuthProvider } from './lib/auth'
 import { DashboardLayout } from './routes/dashboard/DashboardLayout'
 import { Login } from './routes/dashboard/Login'
@@ -9,6 +9,8 @@ import { Payouts } from './routes/dashboard/Payouts'
 import { ProtectedRoute } from './routes/dashboard/ProtectedRoute'
 import { Products } from './routes/dashboard/Products'
 import { Settings } from './routes/dashboard/Settings'
+import { Marketing } from './routes/marketing/Marketing'
+import { RegisterComingSoon } from './routes/marketing/RegisterComingSoon'
 import { PlatformLayout } from './routes/platform/PlatformLayout'
 import { PlatformOverview } from './routes/platform/PlatformOverview'
 import { PlatformProtectedRoute } from './routes/platform/PlatformProtectedRoute'
@@ -24,7 +26,8 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<Marketing />} />
+            <Route path="/register" element={<RegisterComingSoon />} />
             <Route path="/shop/:slug" element={<StorePage />} />
             <Route path="/shop/:slug/orders/:orderId" element={<OrderStatusPage />} />
 
