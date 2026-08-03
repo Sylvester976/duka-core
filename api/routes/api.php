@@ -6,6 +6,7 @@ use App\Http\Controllers\Dashboard\OverviewController;
 use App\Http\Controllers\Dashboard\PayoutController;
 use App\Http\Controllers\Dashboard\ProductController;
 use App\Http\Controllers\Dashboard\TenantController;
+use App\Http\Controllers\Marketing\LeadController;
 use App\Http\Controllers\Platform\PlatformOverviewController;
 use App\Http\Controllers\Platform\PlatformTenantController;
 use App\Http\Controllers\Storefront\CheckoutController;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/ping', fn () => response()->json(['ok' => true]));
 
 Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
+Route::post('/leads', [LeadController::class, 'store'])->middleware('throttle:leads');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
